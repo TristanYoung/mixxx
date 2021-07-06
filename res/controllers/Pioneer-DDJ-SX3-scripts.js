@@ -2048,10 +2048,11 @@ PioneerDDJSX3.VuMeterLeds = function(value, group, control) {
         channel = 0x02,
         midiOut = 0x00;
 
-    value = parseInt(value * 0x76); //full level indicator: 0x7F
+    // scale Mixxx vuMeter to fit the 46 DDJ-SX3 meter values, offset by 6 because peak LED has 6 values
+    value = parseInt(value * 0x2D) - 0x06; //highest value used for level indicator: 0x2E
 
     if (engine.getValue(group, "PeakIndicator")) {
-        value = value + 0x09;
+        value = value + 0x06;
     }
 
     PioneerDDJSX3.valueVuMeter[group + "_current"] = value;
@@ -2069,6 +2070,10 @@ PioneerDDJSX3.VuMeterLeds = function(value, group, control) {
                     }
                 }
             }
+            
+            // DDJ-SX3 quirk, reverse values since larger value represent the lower vuMeter segments
+            midiOut = 0x2E - midiOut;
+            
             midi.sendShortMsg(
                 midiBaseAdress + PioneerDDJSX3.channelGroups[index],
                 channel,
