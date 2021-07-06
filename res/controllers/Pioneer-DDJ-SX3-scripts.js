@@ -10,17 +10,17 @@
 var PioneerDDJSX3 = function() {};
 
 /*
-	Author: 		Tristan Young
-	Version: 		1.0, 07/05/2021
-	Description: 	Pioneer DDJ-SX3 Controller Mapping for Mixxx
-    Source: 		http://github.com/DJMaxergy/mixxx/tree/pioneerDDJSX_mapping
+    Author:         Tristan Young
+    Version:        1.0, 07/05/2021
+    Description:    Pioneer DDJ-SX3 Controller Mapping for Mixxx
+    Source:         https://github.com/TristanYoung/mixxx/tree/Pioneer-DDJ-SX3-Controller-Mapping
 
     Copyright (c) 2021 Tristan Young, licensed under GPL version 2 or later
     Copyright (c) 2018 DJMaxergy, licensed under GPL version 2 or later
     Copyright (c) 2014-2015 various contributors, base for this mapping, licensed under MIT license
 
     Contributors:
-	- DJMaxergy: original DDJ-SX mapping for Mixxx 2.0
+    - DJMaxergy: original DDJ-SX mapping for Mixxx 2.0
     - Michael Stahl (DG3NEC): original DDJ-SB2 mapping for Mixxx 2.0
     - Sophia Herzog: midiAutoDJ-scripts
     - Joan Ardiaca Jové (joan.ardiaca@gmail.com): Pioneer DDJ-SB mapping for Mixxx 2.0
