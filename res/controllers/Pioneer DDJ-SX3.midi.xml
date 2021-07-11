@@ -389,7 +389,7 @@
                 <key>PioneerDDJSX3.fxAssignButton</key>
                 <description>Effect Unit 1 assignment Deck 1, Button: FX1 assign Deck 1</description>
                 <status>0x96</status>
-                <midino>0x4C</midino>
+                <midino>0x50</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -399,7 +399,7 @@
                 <key>PioneerDDJSX3.fxAssignButton</key>
                 <description>Effect Unit 2 assignment Deck 1, Button: FX2 assign Deck 1</description>
                 <status>0x96</status>
-                <midino>0x50</midino>
+                <midino>0x54</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -409,7 +409,7 @@
                 <key>PioneerDDJSX3.fxAssignButton</key>
                 <description>Effect Unit 3 assignment Deck 1, Button: FX1 assign Deck 1</description>
                 <status>0x96</status>
-                <midino>0x70</midino>
+                <midino>0x00</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -419,7 +419,7 @@
                 <key>PioneerDDJSX3.fxAssignButton</key>
                 <description>Effect Unit 4 assignment Deck 1, Button: FX2 assign Deck 1</description>
                 <status>0x96</status>
-                <midino>0x54</midino>
+                <midino>0x00</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -1859,7 +1859,7 @@
                 <key>PioneerDDJSX3.fxAssignButton</key>
                 <description>Effect Unit 1 assignment Deck 2, Button: FX1 assign Deck 2</description>
                 <status>0x96</status>
-                <midino>0x4D</midino>
+                <midino>0x51</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -1869,7 +1869,7 @@
                 <key>PioneerDDJSX3.fxAssignButton</key>
                 <description>Effect Unit 2 assignment Deck 2, Button: FX2 assign Deck 2</description>
                 <status>0x96</status>
-                <midino>0x51</midino>
+                <midino>0x55</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -1879,7 +1879,7 @@
                 <key>PioneerDDJSX3.fxAssignButton</key>
                 <description>Effect Unit 3 assignment Deck 2, Button: FX1 assign Deck 2</description>
                 <status>0x96</status>
-                <midino>0x71</midino>
+                <midino>0x00</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -1889,7 +1889,7 @@
                 <key>PioneerDDJSX3.fxAssignButton</key>
                 <description>Effect Unit 4 assignment Deck 2, Button: FX2 assign Deck 2</description>
                 <status>0x96</status>
-                <midino>0x55</midino>
+                <midino>0x00</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -3329,7 +3329,7 @@
                 <key>PioneerDDJSX3.fxAssignButton</key>
                 <description>Effect Unit 1 assignment Deck 3, Button: FX1 assign Deck 3</description>
                 <status>0x96</status>
-                <midino>0x4E</midino>
+                <midino>0x52</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -3339,7 +3339,7 @@
                 <key>PioneerDDJSX3.fxAssignButton</key>
                 <description>Effect Unit 2 assignment Deck 3, Button: FX2 assign Deck 3</description>
                 <status>0x96</status>
-                <midino>0x52</midino>
+                <midino>0x56</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -3349,7 +3349,7 @@
                 <key>PioneerDDJSX3.fxAssignButton</key>
                 <description>Effect Unit 3 assignment Deck 3, Button: FX1 assign Deck 3</description>
                 <status>0x96</status>
-                <midino>0x72</midino>
+                <midino>0x00</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -3359,7 +3359,7 @@
                 <key>PioneerDDJSX3.fxAssignButton</key>
                 <description>Effect Unit 4 assignment Deck 3, Button: FX2 assign Deck 3</description>
                 <status>0x96</status>
-                <midino>0x56</midino>
+                <midino>0x00</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -4799,7 +4799,7 @@
                 <key>PioneerDDJSX3.fxAssignButton</key>
                 <description>Effect Unit 1 assignment Deck 4, Button: FX1 assign Deck 4</description>
                 <status>0x96</status>
-                <midino>0x4F</midino>
+                <midino>0x53</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -4809,7 +4809,7 @@
                 <key>PioneerDDJSX3.fxAssignButton</key>
                 <description>Effect Unit 2 assignment Deck 4, Button: FX2 assign Deck 4</description>
                 <status>0x96</status>
-                <midino>0x53</midino>
+                <midino>0x57</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -4819,7 +4819,7 @@
                 <key>PioneerDDJSX3.fxAssignButton</key>
                 <description>Effect Unit 3 assignment Deck 4, Button: FX1 assign Deck 4</description>
                 <status>0x96</status>
-                <midino>0x73</midino>
+                <midino>0x00</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -4829,7 +4829,7 @@
                 <key>PioneerDDJSX3.fxAssignButton</key>
                 <description>Effect Unit 4 assignment Deck 4, Button: FX2 assign Deck 4</description>
                 <status>0x96</status>
-                <midino>0x57</midino>
+                <midino>0x00</midino>
                 <options>
                     <script-binding/>
                 </options>
