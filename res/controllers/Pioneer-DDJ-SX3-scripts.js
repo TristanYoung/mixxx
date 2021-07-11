@@ -249,6 +249,7 @@ PioneerDDJSX3.init = function(id) {
     };
 
     PioneerDDJSX3.nonPadLeds = {
+        'quantize': 0x35,
         'headphoneCue': 0x54,
         'shiftHeadphoneCue': 0x68,
         'cue': 0x0C,
@@ -258,7 +259,7 @@ PioneerDDJSX3.init = function(id) {
         'play': 0x0B,
         'shiftPlay': 0x47,
         'vinyl': 0x0D,
-        'sync': 0x58,
+        'sync': 0x5D,
         'shiftSync': 0x5C,
         'autoLoop': 0x14,
         'shiftAutoLoop': 0x50,
@@ -1885,7 +1886,7 @@ PioneerDDJSX3.slipLed = function(value, group, control) {
 };
 
 PioneerDDJSX3.quantizeLed = function(value, group, control) {
-    PioneerDDJSX3.nonPadLedControl(group, PioneerDDJSX3.nonPadLeds.shiftSync, value);
+    PioneerDDJSX3.nonPadLedControl(group, PioneerDDJSX3.nonPadLeds.quantize, value);
 };
 
 PioneerDDJSX3.syncLed = function(value, group, control) {

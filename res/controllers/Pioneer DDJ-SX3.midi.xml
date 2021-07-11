@@ -549,7 +549,7 @@
                 <key>PioneerDDJSX3.jogTouch</key>
                 <description>Jog touch (No Vinyl Mode) Deck 1, left JOGDIAL (Deck 1 active)</description>
                 <status>0x90</status>
-                <midino>0x35</midino>
+                <midino>0x37</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -789,7 +789,7 @@
                 <key>PioneerDDJSX3.quantizeButton</key>
                 <description>Quantize Deck 1, Button: left SHIFT SYNC (Deck 1 active)</description>
                 <status>0x90</status>
-                <midino>0x5C</midino>
+                <midino>0x35</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -799,7 +799,7 @@
                 <key>PioneerDDJSX3.syncButton</key>
                 <description>Sync Deck 1, Button: left SYNC (Deck 1 active)</description>
                 <status>0x90</status>
-                <midino>0x58</midino>
+                <midino>0x5D</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -2019,7 +2019,7 @@
                 <key>PioneerDDJSX3.jogTouch</key>
                 <description>Jog touch (No Vinyl Mode) Deck 2, right JOGDIAL (Deck 2 active)</description>
                 <status>0x91</status>
-                <midino>0x35</midino>
+                <midino>0x37</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -2259,7 +2259,7 @@
                 <key>PioneerDDJSX3.quantizeButton</key>
                 <description>Quantize Deck 2, Button: right SHIFT SYNC (Deck 2 active)</description>
                 <status>0x91</status>
-                <midino>0x5C</midino>
+                <midino>0x35</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -2269,7 +2269,7 @@
                 <key>PioneerDDJSX3.syncButton</key>
                 <description>Sync Deck 2, Button: right SYNC (Deck 2 active)</description>
                 <status>0x91</status>
-                <midino>0x58</midino>
+                <midino>0x5D</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -3489,7 +3489,7 @@
                 <key>PioneerDDJSX3.jogTouch</key>
                 <description>Jog touch (No Vinyl Mode) Deck 3, left JOGDIAL (Deck 3 active)</description>
                 <status>0x92</status>
-                <midino>0x35</midino>
+                <midino>0x37</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -3729,7 +3729,7 @@
                 <key>PioneerDDJSX3.quantizeButton</key>
                 <description>Quantize Deck 3, Button: left SHIFT SYNC (Deck 3 active)</description>
                 <status>0x92</status>
-                <midino>0x5C</midino>
+                <midino>0x35</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -3739,7 +3739,7 @@
                 <key>PioneerDDJSX3.syncButton</key>
                 <description>Sync Deck 3, Button: left SYNC (Deck 3 active)</description>
                 <status>0x92</status>
-                <midino>0x58</midino>
+                <midino>0x5D</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -4959,7 +4959,7 @@
                 <key>PioneerDDJSX3.jogTouch</key>
                 <description>Jog touch (No Vinyl Mode) Deck 4, right JOGDIAL (Deck 4 active)</description>
                 <status>0x93</status>
-                <midino>0x35</midino>
+                <midino>0x37</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -5199,7 +5199,7 @@
                 <key>PioneerDDJSX3.quantizeButton</key>
                 <description>Quantize Deck 4, Button: right SHIFT SYNC (Deck 4 active)</description>
                 <status>0x93</status>
-                <midino>0x5C</midino>
+                <midino>0x35</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -5209,7 +5209,7 @@
                 <key>PioneerDDJSX3.syncButton</key>
                 <description>Sync Deck 4, Button: right SYNC (Deck 4 active)</description>
                 <status>0x93</status>
-                <midino>0x58</midino>
+                <midino>0x5D</midino>
                 <options>
                     <script-binding/>
                 </options>
