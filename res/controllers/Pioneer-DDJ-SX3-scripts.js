@@ -103,6 +103,9 @@ PioneerDDJSX3.autoPFL = true;
 //               INIT, SHUTDOWN & GLOBAL HELPER              //
 ///////////////////////////////////////////////////////////////
 
+// Put controller into Serato mode
+PioneerDDJSX3.serato=[0xF0,0x00,0x20,0x7f,0x50,0x01,0xF7];
+
 PioneerDDJSX3.shiftPressed = false;
 PioneerDDJSX3.rotarySelectorChanged = false;
 PioneerDDJSX3.panels = [false, false]; // view state of effect and sampler panel
@@ -394,6 +397,9 @@ PioneerDDJSX3.init = function(id) {
         '[Channel4]_enabled': 1
     };
 
+    // create Serato keepalive timer - required for white jog wheel spinner LEDs to work
+	PioneerDDJSX3.keepaliveTimer=engine.beginTimer(250,"PioneerDDJSX3.keepalive",0);
+
     // set 32 Samplers as default:
     engine.setValue("[Master]", "num_samplers", 32);
 
@@ -444,6 +450,12 @@ PioneerDDJSX3.shutdown = function() {
     PioneerDDJSX3.resetNonDeckLeds();
 };
 
+///////////////////////////////////////////////////////////////
+//        Tristan's keep-alive timer for Serato              //
+///////////////////////////////////////////////////////////////
+PioneerDDJSX3.keepalive = function() {
+	midi.sendSysexMsg(PioneerDDJSX3.serato,PioneerDDJSX3.serato.length);
+};
 
 ///////////////////////////////////////////////////////////////
 //                      VU - METER                           //
