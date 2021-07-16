@@ -787,7 +787,7 @@
             <control>
                 <group>[Channel1]</group>
                 <key>PioneerDDJSX3.quantizeButton</key>
-                <description>Quantize Deck 1, Button: left SHIFT SYNC (Deck 1 active)</description>
+                <description>Quantize Deck 1, Button: left QUANTIZE (Deck 1 active)</description>
                 <status>0x90</status>
                 <midino>0x35</midino>
                 <options>
@@ -2257,7 +2257,7 @@
             <control>
                 <group>[Channel2]</group>
                 <key>PioneerDDJSX3.quantizeButton</key>
-                <description>Quantize Deck 2, Button: right SHIFT SYNC (Deck 2 active)</description>
+                <description>Quantize Deck 2, Button: right QUANTIZE (Deck 2 active)</description>
                 <status>0x91</status>
                 <midino>0x35</midino>
                 <options>
@@ -3727,7 +3727,7 @@
             <control>
                 <group>[Channel3]</group>
                 <key>PioneerDDJSX3.quantizeButton</key>
-                <description>Quantize Deck 3, Button: left SHIFT SYNC (Deck 3 active)</description>
+                <description>Quantize Deck 3, Button: left QUANTIZE (Deck 3 active)</description>
                 <status>0x92</status>
                 <midino>0x35</midino>
                 <options>
@@ -5197,7 +5197,7 @@
             <control>
                 <group>[Channel4]</group>
                 <key>PioneerDDJSX3.quantizeButton</key>
-                <description>Quantize Deck 4, Button: right SHIFT SYNC (Deck 4 active)</description>
+                <description>Quantize Deck 4, Button: right QUANTIZE (Deck 4 active)</description>
                 <status>0x93</status>
                 <midino>0x35</midino>
                 <options>
