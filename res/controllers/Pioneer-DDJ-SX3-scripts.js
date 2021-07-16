@@ -104,7 +104,10 @@ PioneerDDJSX3.autoPFL = true;
 ///////////////////////////////////////////////////////////////
 
 // Put controller into Serato mode
-PioneerDDJSX3.serato=[0xF0,0x00,0x20,0x7f,0x50,0x01,0xF7];
+PioneerDDJSX3.Serato_SYSEX1=[0xF0,0x00,0x20,0x7F,0x50,0x01,0xF7];
+PioneerDDJSX3.Serato_SYSEX2=[0xF0,0x00,0x20,0x7F,0x03,0x01,0xF7];  // is this even required?
+PioneerDDJSX3.Serato_KEEPALIVE=[0xF0,0x00,0x20,0x7F,0x50,0x01,0xF7];	
+PioneerDDJSX3.test=4;
 
 PioneerDDJSX3.shiftPressed = false;
 PioneerDDJSX3.rotarySelectorChanged = false;
@@ -120,6 +123,8 @@ PioneerDDJSX3.toggledBrake = [false, false, false, false];
 PioneerDDJSX3.scratchMode = [true, true, true, true];
 PioneerDDJSX3.wheelLedsBlinkStatus = [0, 0, 0, 0];
 PioneerDDJSX3.wheelLedsPosition = [0, 0, 0, 0];
+PioneerDDJSX3.wheelCentreLed = [0, 0, 0, 0];
+PioneerDDJSX3.wheelCentreLedStyle = 1; // 0 = rotation, 1 = beats (static beat grid)
 PioneerDDJSX3.setUpSpeedSliderRange = [0.08, 0.08, 0.08, 0.08];
 
 // PAD mode storage:
@@ -199,6 +204,14 @@ PioneerDDJSX3.activeSlicerMode = [
 
 
 PioneerDDJSX3.init = function(id) {
+    
+	// Initiate Serato mode
+    midi.sendSysexMsg(PioneerDDJSX3.Serato_SYSEX1,PioneerDDJSX3.Serato_SYSEX1.length);
+    midi.sendSysexMsg(PioneerDDJSX3.Serato_SYSEX2,PioneerDDJSX3.Serato_SYSEX2.length);
+
+    // create Serato keepalive timer - required for white jog wheel spinner LEDs to work
+    PioneerDDJSX3.keepaliveTimer=engine.beginTimer(250,"PioneerDDJSX3.keepSeratoalive",0);
+		
     PioneerDDJSX3.scratchSettings = {
         'alpha': 1.0 / 8,
         'beta': 1.0 / 8 / 32,
@@ -397,9 +410,6 @@ PioneerDDJSX3.init = function(id) {
         '[Channel4]_enabled': 1
     };
 
-    // create Serato keepalive timer - required for white jog wheel spinner LEDs to work
-	PioneerDDJSX3.keepaliveTimer=engine.beginTimer(250,"PioneerDDJSX3.keepalive",0);
-
     // set 32 Samplers as default:
     engine.setValue("[Master]", "num_samplers", 32);
 
@@ -408,8 +418,8 @@ PioneerDDJSX3.init = function(id) {
         PioneerDDJSX3.vuMeterTimer = engine.beginTimer(200, "PioneerDDJSX3.vuMeterTwinkle()");
     }
 
-    // initiate control status request:
-    midi.sendShortMsg(0x9B, 0x08, 0x7F);
+    // initiate control status request:   Tristan disabled this - is it really required if we're in serato mode?
+    //midi.sendShortMsg(0x9B, 0x08, 0x7F);
 
     // bind controls and init deck parameters:
     PioneerDDJSX3.bindNonDeckControlConnections(true);
@@ -451,10 +461,10 @@ PioneerDDJSX3.shutdown = function() {
 };
 
 ///////////////////////////////////////////////////////////////
-//        Tristan's keep-alive timer for Serato              //
+//                Keep-alive timer for Serato                //
 ///////////////////////////////////////////////////////////////
-PioneerDDJSX3.keepalive = function() {
-	midi.sendSysexMsg(PioneerDDJSX3.serato,PioneerDDJSX3.serato.length);
+PioneerDDJSX3.keepSeratoalive = function() {
+	midi.sendSysexMsg(PioneerDDJSX3.Serato_KEEPALIVE,PioneerDDJSX3.Serato_KEEPALIVE.length);
 };
 
 ///////////////////////////////////////////////////////////////
@@ -1780,6 +1790,19 @@ PioneerDDJSX3.wheelLedControl = function(deck, ledNumber) {
     }
 };
 
+PioneerDDJSX3.wheelCentreLedControl = function(deck, ledNumber) {
+    var wheelLedBaseChannel = 0xBB,
+        channel = PioneerDDJSX3.deckConverter(deck)+4;
+
+    if (channel !== null) {
+        midi.sendShortMsg(
+            wheelLedBaseChannel,
+            channel,
+            ledNumber
+        );
+    }
+};
+
 PioneerDDJSX3.generalLedControl = function(ledNumber, active) {
     var generalLedBaseChannel = 0x96;
 
@@ -1842,7 +1865,10 @@ PioneerDDJSX3.wheelLeds = function(value, group, control) {
         remainingTime = duration - elapsedTime,
         revolutionsPerSecond = PioneerDDJSX3.scratchSettings.vinylSpeed / 60,
         speed = parseInt(revolutionsPerSecond * PioneerDDJSX3.wheelLedCircle.maxVal),
-        wheelPos = PioneerDDJSX3.wheelLedCircle.minVal;
+        wheelPos = PioneerDDJSX3.wheelLedCircle.minVal,
+        playposition = engine.getValue(group, "playposition"),
+        bpm = engine.getValue(group, "bpm"),
+        currentwheelCentreLed = 0;
 
     if (value >= 0) {
         wheelPos = PioneerDDJSX3.wheelLedCircle.minVal + 0x01 + ((speed * elapsedTime) % PioneerDDJSX3.wheelLedCircle.maxVal);
@@ -1869,6 +1895,20 @@ PioneerDDJSX3.wheelLeds = function(value, group, control) {
       PioneerDDJSX3.wheelLedControl(group, wheelPos);
     }
     PioneerDDJSX3.wheelLedsPosition[deck] = wheelPos;
+
+    // wheelCentreLed display
+    if (PioneerDDJSX3.wheelCentreLedStyle) {
+        // show beats
+        currentwheelCentreLed = Math.round((playposition * duration) * (bpm / 60)) % 8;
+    } else {
+        // show rotations
+        currentwheelCentreLed = ((1+Math.floor((playposition)*(engine.getValue(group,"track_samples")/engine.getValue(group,"track_samplerate"))/2)*39.96)/0x48)%8;
+    }
+
+    if (PioneerDDJSX3.wheelCentreLed[deck] !== currentwheelCentreLed) {
+        PioneerDDJSX3.wheelCentreLedControl(group, currentwheelCentreLed);
+    }
+    PioneerDDJSX3.wheelCentreLed[deck] = currentwheelCentreLed;
 };
 
 PioneerDDJSX3.cueLed = function(value, group, control) {
