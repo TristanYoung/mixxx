@@ -106,7 +106,7 @@ PioneerDDJSX3.autoPFL = true;
 // Put controller into Serato mode
 PioneerDDJSX3.Serato_SYSEX1=[0xF0,0x00,0x20,0x7F,0x50,0x01,0xF7];
 PioneerDDJSX3.Serato_SYSEX2=[0xF0,0x00,0x20,0x7F,0x03,0x01,0xF7];  // is this even required?
-PioneerDDJSX3.Serato_KEEPALIVE=[0xF0,0x00,0x20,0x7F,0x50,0x01,0xF7];	
+PioneerDDJSX3.Serato_KEEPALIVE=[0xF0,0x00,0x20,0x7F,0x50,0x01,0xF7];
 PioneerDDJSX3.test=4;
 
 PioneerDDJSX3.shiftPressed = false;
@@ -205,13 +205,13 @@ PioneerDDJSX3.activeSlicerMode = [
 
 PioneerDDJSX3.init = function(id) {
     
-	// Initiate Serato mode
+    // Initiate Serato mode
     midi.sendSysexMsg(PioneerDDJSX3.Serato_SYSEX1,PioneerDDJSX3.Serato_SYSEX1.length);
     midi.sendSysexMsg(PioneerDDJSX3.Serato_SYSEX2,PioneerDDJSX3.Serato_SYSEX2.length);
 
     // create Serato keepalive timer - required for white jog wheel spinner LEDs to work
     PioneerDDJSX3.keepaliveTimer=engine.beginTimer(250,"PioneerDDJSX3.keepSeratoalive",0);
-		
+
     PioneerDDJSX3.scratchSettings = {
         'alpha': 1.0 / 8,
         'beta': 1.0 / 8 / 32,
@@ -464,7 +464,7 @@ PioneerDDJSX3.shutdown = function() {
 //                Keep-alive timer for Serato                //
 ///////////////////////////////////////////////////////////////
 PioneerDDJSX3.keepSeratoalive = function() {
-	midi.sendSysexMsg(PioneerDDJSX3.Serato_KEEPALIVE,PioneerDDJSX3.Serato_KEEPALIVE.length);
+    midi.sendSysexMsg(PioneerDDJSX3.Serato_KEEPALIVE,PioneerDDJSX3.Serato_KEEPALIVE.length);
 };
 
 ///////////////////////////////////////////////////////////////
@@ -1624,6 +1624,30 @@ PioneerDDJSX3.shiftPanelSelectButton = function(channel, control, value, status,
         }
     }
 };
+
+PioneerDDJSX3.pitchUpButton = function(channel, control, value, status, group) {
+if (value) {
+        engine.setValue(group, "pitch_up", true);
+    }
+}
+
+PioneerDDJSX3.pitchDownButton = function(channel, control, value, status, group) {
+if (value) {
+        engine.setValue(group, "pitch_down", true);
+    }
+}
+
+PioneerDDJSX3.pitchResetButton = function(channel, control, value, status, group) {
+if (value) {
+        engine.setValue(group, "reset_key", true);
+    }
+}
+
+PioneerDDJSX3.pitchSyncButton = function(channel, control, value, status, group) {
+if (value) {
+        engine.setValue(group, "sync_key", true);
+    }
+}
 
 
 ///////////////////////////////////////////////////////////////

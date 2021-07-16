@@ -206,6 +206,46 @@
             </control>
             <control>
                 <group>[Channel1]</group>
+                <key>PioneerDDJSX3.pitchUpButton</key>
+                <description>Channel pitch up Deck 1, Button: KEY UP Deck 1</description>
+                <status>0x90</status>
+                <midino>0x79</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+			<control>
+                <group>[Channel1]</group>
+                <key>PioneerDDJSX3.pitchDownButton</key>
+                <description>Channel pitch down Deck 1, Button: KEY DOWN Deck 1</description>
+                <status>0x90</status>
+                <midino>0x0A</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>PioneerDDJSX3.pitchSyncButton</key>
+                <description>Channel pitch sync Deck 1, Button: SHIFT &amp; KEY UP Deck 1</description>
+                <status>0x90</status>
+                <midino>0x64</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>PioneerDDJSX3.pitchResetButton</key>
+                <description>Channel pitch reset Deck 1, Button: SHIFT &amp; KEY DOWN Deck 1</description>
+                <status>0x90</status>
+                <midino>0x65</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
                 <key>PioneerDDJSX3.deckFaderMSB</key>
                 <description>Channel fader Deck 1 (MSB), Slider: CHANNELFADER Deck 1</description>
                 <status>0xB0</status>
@@ -1670,6 +1710,46 @@
                 <description>Set PAD-Mode, Button: SHIFT ROLL LEFT (Deck 1 active)</description>
                 <status>0x90</status>
                 <midino>0x6B</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>PioneerDDJSX3.pitchUpButton</key>
+                <description>Channel pitch up Deck 2, Button: KEY UP Deck 2</description>
+                <status>0x91</status>
+                <midino>0x79</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+			<control>
+                <group>[Channel2]</group>
+                <key>PioneerDDJSX3.pitchDownButton</key>
+                <description>Channel pitch down Deck 2, Button: KEY DOWN Deck 2</description>
+                <status>0x91</status>
+                <midino>0x0A</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>PioneerDDJSX3.pitchSyncButton</key>
+                <description>Channel pitch sync Deck 2, Button: SHIFT &amp; KEY UP Deck 2</description>
+                <status>0x91</status>
+                <midino>0x64</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>PioneerDDJSX3.pitchResetButton</key>
+                <description>Channel pitch reset Deck 2, Button: SHIFT &amp; KEY DOWN Deck 2</description>
+                <status>0x91</status>
+                <midino>0x65</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -3146,6 +3226,46 @@
             </control>
             <control>
                 <group>[Channel3]</group>
+                <key>PioneerDDJSX3.pitchUpButton</key>
+                <description>Channel pitch up Deck 3, Button: KEY UP Deck 3</description>
+                <status>0x92</status>
+                <midino>0x79</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+			<control>
+                <group>[Channel3]</group>
+                <key>PioneerDDJSX3.pitchDownButton</key>
+                <description>Channel pitch down Deck 3, Button: KEY DOWN Deck 3</description>
+                <status>0x92</status>
+                <midino>0x0A</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>PioneerDDJSX3.pitchSyncButton</key>
+                <description>Channel pitch sync Deck 3, Button: SHIFT &amp; KEY UP Deck 3</description>
+                <status>0x92</status>
+                <midino>0x64</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>PioneerDDJSX3.pitchResetButton</key>
+                <description>Channel pitch reset Deck 3, Button: SHIFT &amp; KEY DOWN Deck 3</description>
+                <status>0x92</status>
+                <midino>0x65</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
                 <key>PioneerDDJSX3.deckFaderMSB</key>
                 <description>Channel fader Deck 3 (MSB), Slider: CHANNELFADER Deck 3</description>
                 <status>0xB2</status>
@@ -4610,6 +4730,46 @@
                 <description>Set PAD-Mode, Button: SHIFT ROLL LEFT (Deck 3 active)</description>
                 <status>0x92</status>
                 <midino>0x6B</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>PioneerDDJSX3.pitchUpButton</key>
+                <description>Channel pitch up Deck 4, Button: KEY UP Deck 4</description>
+                <status>0x93</status>
+                <midino>0x79</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+			<control>
+                <group>[Channel4]</group>
+                <key>PioneerDDJSX3.pitchDownButton</key>
+                <description>Channel pitch down Deck 4, Button: KEY DOWN Deck 4</description>
+                <status>0x93</status>
+                <midino>0x0A</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>PioneerDDJSX3.pitchSyncButton</key>
+                <description>Channel pitch sync Deck 4, Button: SHIFT &amp; KEY UP Deck 4</description>
+                <status>0x93</status>
+                <midino>0x64</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>PioneerDDJSX3.pitchResetButton</key>
+                <description>Channel pitch reset Deck 4, Button: SHIFT &amp; KEY DOWN Deck 4</description>
+                <status>0x93</status>
+                <midino>0x65</midino>
                 <options>
                     <script-binding/>
                 </options>
