@@ -64,6 +64,15 @@ var PioneerDDJSX3 = function() {};
 //                       USER OPTIONS                        //
 ///////////////////////////////////////////////////////////////
 
+// Sets filter resonance, 4 mimics Serato
+PioneerDDJSX3.Resonance=4;
+
+// Default gain and mix settings
+// Range 0 to 1, 0.5 is the default for each setting
+PioneerDDJSX3.masterGain=.25,   // default startup master gain
+PioneerDDJSX3.headphoneGain=.5, // default startup headphone gain
+PioneerDDJSX3.headphoneMix=.5,  // default startup headphone mix
+
 // Sets the jogwheels sensitivity. 1 is default, 2 is twice as sensitive, 0.5 is half as sensitive.
 PioneerDDJSX3.jogwheelSensitivity = 1;
 
@@ -109,6 +118,7 @@ PioneerDDJSX3.Serato_SYSEX2=[0xF0,0x00,0x20,0x7F,0x03,0x01,0xF7];  // is this ev
 PioneerDDJSX3.Serato_KEEPALIVE=[0xF0,0x00,0x20,0x7F,0x50,0x01,0xF7];
 PioneerDDJSX3.test=4;
 
+// Everything else
 PioneerDDJSX3.shiftPressed = false;
 PioneerDDJSX3.rotarySelectorChanged = false;
 PioneerDDJSX3.panels = [false, false]; // view state of effect and sampler panel
@@ -409,6 +419,17 @@ PioneerDDJSX3.init = function(id) {
         '[Channel3]_enabled': 1,
         '[Channel4]_enabled': 1
     };
+
+    // change resonance of filter
+	for (var i=1; i <=4; i++) {
+        engine.setValue("[QuickEffectRack1_[Channel"+i+"]_Effect1]","parameter2",PioneerDDJSX3.Resonance);
+    }
+
+    // set Mixxx master gain, headphone gain, headphone mix
+    // As of Mixxx v2.3, Mixx does not save defaults for these controls
+    engine.setParameter("[Master]","gain",PioneerDDJSX3.masterGain);
+    engine.setParameter("[Master]","headGain",PioneerDDJSX3.headphoneGain);
+    engine.setParameter("[Master]","headMix",PioneerDDJSX3.headphoneMix);
 
     // set 32 Samplers as default:
     engine.setValue("[Master]", "num_samplers", 32);
