@@ -20,6 +20,7 @@ var PioneerDDJSX3 = function() {};
     Copyright (c) 2014-2015 various contributors, base for this mapping, licensed under MIT license
 
     Contributors:
+    - Ardje: code from his own SX3 mapping for Mixxx 2.0
     - DJMaxergy: original DDJ-SX mapping for Mixxx 2.0
     - Michael Stahl (DG3NEC): original DDJ-SB2 mapping for Mixxx 2.0
     - Sophia Herzog: midiAutoDJ-scripts
