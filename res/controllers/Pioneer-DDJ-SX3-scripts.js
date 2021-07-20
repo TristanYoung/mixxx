@@ -220,7 +220,7 @@ PioneerDDJSX3.init = function(id) {
     midi.sendSysexMsg(PioneerDDJSX3.Serato_SYSEX1,PioneerDDJSX3.Serato_SYSEX1.length);
     midi.sendSysexMsg(PioneerDDJSX3.Serato_SYSEX2,PioneerDDJSX3.Serato_SYSEX2.length);
 
-    // create Serato keepalive timer - required for white jog wheel spinner LEDs to work
+    // create Serato keep-alive timer - required for white jog wheel spinner LEDs to work
     PioneerDDJSX3.keepaliveTimer=engine.beginTimer(250,"PioneerDDJSX3.keepSeratoalive",0);
 
     PioneerDDJSX3.scratchSettings = {
@@ -409,7 +409,12 @@ PioneerDDJSX3.init = function(id) {
         'minVal': 0x00,
         'maxVal': 0x48
     };
-
+	
+	PioneerDDJSX3.wheelCentreLed = {
+        'minVal': 0x00,
+        'maxVal': 0x07
+    };
+	
     PioneerDDJSX3.valueVuMeter = {
         '[Channel1]_current': 0,
         '[Channel2]_current': 0,
@@ -483,11 +488,12 @@ PioneerDDJSX3.shutdown = function() {
 };
 
 ///////////////////////////////////////////////////////////////
-//                Keep-alive timer for Serato                //
+//                   Serato Keep-alive                       //
 ///////////////////////////////////////////////////////////////
 PioneerDDJSX3.keepSeratoalive = function() {
     midi.sendSysexMsg(PioneerDDJSX3.Serato_KEEPALIVE,PioneerDDJSX3.Serato_KEEPALIVE.length);
 };
+
 
 ///////////////////////////////////////////////////////////////
 //                      VU - METER                           //
@@ -767,6 +773,7 @@ PioneerDDJSX3.initDeck = function(group) {
         false
     );
     PioneerDDJSX3.wheelLedControl(group, PioneerDDJSX3.wheelLedCircle.minVal);
+	PioneerDDJSX3.wheelCentreLedControl(group, PioneerDDJSX3.wheelCentreLed.minVal);
     PioneerDDJSX3.nonPadLedControl(group, PioneerDDJSX3.nonPadLeds.hotCueMode, true); // set HOT CUE Pad-Mode
 };
 
@@ -775,6 +782,7 @@ PioneerDDJSX3.resetDeck = function(group) {
 
     PioneerDDJSX3.VuMeterLeds(0x00, group, 0x00); // reset VU meter Leds
     PioneerDDJSX3.wheelLedControl(group, PioneerDDJSX3.wheelLedCircle.minVal); // reset jogwheel Leds
+	PioneerDDJSX3.wheelCentreLedControl(group, PioneerDDJSX3.wheelCentreLed.minVal); // reset jogwheel centre red Leds
     PioneerDDJSX3.nonPadLedControl(group, PioneerDDJSX3.nonPadLeds.hotCueMode, true); // reset HOT CUE Pad-Mode
     // pad Leds:
     for (var i = 0; i < 8; i++) {
@@ -2277,7 +2285,7 @@ PioneerDDJSX3.triggerVinylLed = function(deck) {
 };
 
 PioneerDDJSX3.pitchBendFromJog = function(group, movement) {
-    engine.setValue(group, "jog", movement / 5 * PioneerDDJSX3.jogwheelSensitivity);
+	engine.setValue(group, "jog", movement / 5 * PioneerDDJSX3.jogwheelSensitivity);
 };
 
 

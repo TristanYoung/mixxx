@@ -589,7 +589,7 @@
                 <key>PioneerDDJSX3.jogTouch</key>
                 <description>Jog touch (No Vinyl Mode) Deck 1, left JOGDIAL (Deck 1 active)</description>
                 <status>0x90</status>
-                <midino>0x37</midino>
+                <midino>0x36</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -2099,7 +2099,7 @@
                 <key>PioneerDDJSX3.jogTouch</key>
                 <description>Jog touch (No Vinyl Mode) Deck 2, right JOGDIAL (Deck 2 active)</description>
                 <status>0x91</status>
-                <midino>0x37</midino>
+                <midino>0x36</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -3609,7 +3609,7 @@
                 <key>PioneerDDJSX3.jogTouch</key>
                 <description>Jog touch (No Vinyl Mode) Deck 3, left JOGDIAL (Deck 3 active)</description>
                 <status>0x92</status>
-                <midino>0x37</midino>
+                <midino>0x36</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -5119,7 +5119,7 @@
                 <key>PioneerDDJSX3.jogTouch</key>
                 <description>Jog touch (No Vinyl Mode) Deck 4, right JOGDIAL (Deck 4 active)</description>
                 <status>0x93</status>
-                <midino>0x37</midino>
+                <midino>0x36</midino>
                 <options>
                     <script-binding/>
                 </options>
