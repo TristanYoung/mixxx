@@ -226,7 +226,7 @@ PioneerDDJSX3.init = function(id) {
     PioneerDDJSX3.scratchSettings = {
         'alpha': 1.0 / 8,
         'beta': 1.0 / 8 / 32,
-        'jogResolution': 2048,
+        'jogResolution': 2055,
         'vinylSpeed': 33 + 1 / 3,
     };
 
@@ -1002,6 +1002,9 @@ PioneerDDJSX3.playButton = function(channel, control, value, status, group) {
     var deck = PioneerDDJSX3.channelGroups[group],
         playing = engine.getValue(group, "play");
 
+    // disable scratch in case jog wheel was turned before play button was pressed
+    engine.scratchDisable(script.deckFromGroup(group));
+    
     if (value) {
         if (playing) {
             script.brake(channel, control, value, status, group);
@@ -2201,7 +2204,14 @@ PioneerDDJSX3.getJogWheelDelta = function(value) {
 };
 
 PioneerDDJSX3.jogRingTick = function(channel, control, value, status, group) {
+    var deck = channel+1;
+    
+    if (engine.isScratching(deck)) {
+        // continue scratching if the wheel is untouched while it is still scratch-spinning
+        engine.scratchTick(deck,PioneerDDJSX3.getJogWheelDelta(value));
+    } else {
     PioneerDDJSX3.pitchBendFromJog(group, PioneerDDJSX3.getJogWheelDelta(value));
+    }
 };
 
 PioneerDDJSX3.jogRingTickShift = function(channel, control, value, status, group) {
