@@ -66,13 +66,19 @@ var PioneerDDJSX3 = function() {};
 ///////////////////////////////////////////////////////////////
 
 // Sets filter resonance, 4 mimics Serato
-PioneerDDJSX3.Resonance=4;
+PioneerDDJSX3.Resonance = 4;
 
 // Default gain and mix settings
 // Range 0 to 1, 0.5 is the default for each setting
-PioneerDDJSX3.masterGain=.25,   // default startup master gain
-PioneerDDJSX3.headphoneGain=.5, // default startup headphone gain
-PioneerDDJSX3.headphoneMix=.5,  // default startup headphone mix
+PioneerDDJSX3.masterGain = .25,   // default startup master gain
+PioneerDDJSX3.headphoneGain = .5, // default startup headphone gain
+PioneerDDJSX3.headphoneMix = .5,  // default startup headphone mix
+
+// set default button/assignment state on startup. 0 = off, 1 = on, 2 = last used
+PioneerDDJSX3.defaultKeyLock = [1, 1, 1, 1];  // keylock state
+PioneerDDJSX3.defaultQuantize = [1, 1, 1, 1]; // quantize state
+PioneerDDJSX3.defaultFX1 = [1, 1, 1, 1];      // FX1 assignment
+PioneerDDJSX3.defaultFX2 = [1, 1, 1, 1];      // FX2 assignment
 
 // Sets the jogwheels sensitivity. 1 is default, 2 is twice as sensitive, 0.5 is half as sensitive.
 PioneerDDJSX3.jogwheelSensitivity = 1;
@@ -427,18 +433,46 @@ PioneerDDJSX3.init = function(id) {
     };
 
     // change resonance of filter
-	for (var i=1; i <=4; i++) {
-        engine.setValue("[QuickEffectRack1_[Channel"+i+"]_Effect1]","parameter2",PioneerDDJSX3.Resonance);
+	for (var i=0; i<4; i++) {
+        engine.setValue("[QuickEffectRack1_[Channel"+i+1+"]_Effect1]","parameter2",PioneerDDJSX3.Resonance);
     }
 
     // set Mixxx master gain, headphone gain, headphone mix
-    // As of Mixxx v2.3, Mixx does not save defaults for these controls
+    // as of Mixxx v2.3, Mixx does not save defaults for these controls
     engine.setParameter("[Master]","gain",PioneerDDJSX3.masterGain);
     engine.setParameter("[Master]","headGain",PioneerDDJSX3.headphoneGain);
     engine.setParameter("[Master]","headMix",PioneerDDJSX3.headphoneMix);
 
     // set 32 Samplers as default:
     engine.setValue("[Master]", "num_samplers", 32);
+
+    // set keylock default:
+    for (var i=0; i<4; i++) {
+        if (PioneerDDJSX3.defaultKeyLock[i] < 2) {
+            engine.setValue("[Channel"+(i+1)+"]","keylock",PioneerDDJSX3.defaultKeyLock[i]);
+        }
+    }
+    
+    // set quantize default:
+    for (var i=0; i<4; i++) {
+        if (PioneerDDJSX3.defaultQuantize[i] < 2) {
+            engine.setValue("[Channel"+(i+1)+"]","quantize",PioneerDDJSX3.defaultQuantize[i]);
+        }
+    }
+      
+    // set FX1 assignment defaults:
+    for (var i=0; i<4; i++) {
+        if (PioneerDDJSX3.defaultFX1[i] < 2) {
+            engine.setValue("[EffectRack1_EffectUnit1]","group_[Channel"+(i+1)+"]_enable",PioneerDDJSX3.defaultFX1[i]);
+        }
+    }
+
+    // set FX2 assignment defaults:
+    for (var i=0; i<4; i++) {
+        if (PioneerDDJSX3.defaultFX2[i] < 2) {
+            engine.setValue("[EffectRack1_EffectUnit2]","group_[Channel"+(i+1)+"]_enable",PioneerDDJSX3.defaultFX2[i]);
+        }
+    }
 
     // activate vu meter timer for Auto DJ:
     if (PioneerDDJSX3.twinkleVumeterAutodjOn) {
