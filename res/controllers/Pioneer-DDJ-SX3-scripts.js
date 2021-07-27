@@ -144,6 +144,10 @@ PioneerDDJSX3.wheelCentreLed = [0, 0, 0, 0];
 PioneerDDJSX3.wheelCentreLedStyle = 1; // 0 = rotation, 1 = beats (static beat grid)
 PioneerDDJSX3.setUpSpeedSliderRange = [0.08, 0.08, 0.08, 0.08];
 
+// Sync button behaviour
+PioneerDDJSX3.syncLongPress = false;
+PioneerDDJSX3.syncTimer = 0;
+
 // PAD mode storage:
 PioneerDDJSX3.padModes = {
     'hotCue': 0,
@@ -1615,8 +1619,39 @@ PioneerDDJSX3.gridSlideButton = function(channel, control, value, status, group)
 };
 
 PioneerDDJSX3.syncButton = function(channel, control, value, status, group) {
-    if (value) {
-        script.toggleControl(group, "sync_enabled");
+    //sync hold <500ms: beatsync tempo or disable sync lock, >500ms: enable sync lock
+    if (value == 0x7F) {
+        PioneerDDJSX3.syncDown(control, group);
+    } else {
+        PioneerDDJSX3.syncUp(control, group);
+    }
+};
+
+PioneerDDJSX3.syncAssertLongPress = function() {
+    PioneerDDJSX3.syncLongPress = true;
+    PioneerDDJSX3.syncTimer = 0;
+};
+
+PioneerDDJSX3.syncDown = function(control, group) {
+    PioneerDDJSX3.syncLongPress = false;
+    PioneerDDJSX3.syncTimer = engine.beginTimer(500, "PioneerDDJSX3.syncAssertLongPress()", true);
+    engine.setValue(group, 'sync_enabled', true);
+};
+
+PioneerDDJSX3.syncUp = function(control, group) {
+    if (PioneerDDJSX3.syncTimer !== 0) {
+        engine.stopTimer(PioneerDDJSX3.syncTimer);
+        PioneerDDJSX3.syncTimer = 0;
+    }
+    if (PioneerDDJSX3.syncLongPress) {
+        engine.setValue(group, 'sync_enabled', true);
+    } else {
+        if (engine.getValue(group, 'sync_enabled')) {
+            engine.setValue(group, 'sync_enabled', false);
+        }
+        else {
+            engine.setValue(group, 'beatsync_tempo', true);
+        }
     }
 };
 
