@@ -74,11 +74,14 @@ PioneerDDJSX3.masterGain = .25,   // default startup master gain
 PioneerDDJSX3.headphoneGain = .5, // default startup headphone gain
 PioneerDDJSX3.headphoneMix = .5,  // default startup headphone mix
 
-// set default button/assignment state on startup. 0 = off, 1 = on, 2 = last used
+// Set default button/assignment state on startup. 0 = off, 1 = on, 2 = last used
 PioneerDDJSX3.defaultKeyLock = [1, 1, 1, 1];  // keylock state
 PioneerDDJSX3.defaultQuantize = [1, 1, 1, 1]; // quantize state
 PioneerDDJSX3.defaultFX1 = [1, 1, 1, 1];      // FX1 assignment
 PioneerDDJSX3.defaultFX2 = [1, 1, 1, 1];      // FX2 assignment
+
+// Synchronize Mixxx's controls to the Serato-certified controller's controls upon startup
+PioneerDDJSX3.Serato_syncMixxxControls = true;
 
 // Sets the jogwheels sensitivity. 1 is default, 2 is twice as sensitive, 0.5 is half as sensitive.
 PioneerDDJSX3.jogwheelSensitivity = 1;
@@ -121,8 +124,14 @@ PioneerDDJSX3.autoPFL = true;
 
 // Put controller into Serato mode
 PioneerDDJSX3.Serato_SYSEX1=[0xF0,0x00,0x20,0x7F,0x50,0x01,0xF7];
-PioneerDDJSX3.Serato_SYSEX2=[0xF0,0x00,0x20,0x7F,0x03,0x01,0xF7];  // is this even required?
+
+// Requests status of all controls on a Serato-certified controller
+PioneerDDJSX3.Serato_ControllerStatusDump=[0xF0,0x00,0x20,0x7F,0x03,0x01,0xF7];  
+
+// Keep controller in Serato mode
 PioneerDDJSX3.Serato_KEEPALIVE=[0xF0,0x00,0x20,0x7F,0x50,0x01,0xF7];
+
+
 PioneerDDJSX3.test=4;
 
 // Everything else
@@ -228,7 +237,6 @@ PioneerDDJSX3.init = function(id) {
     
     // Initiate Serato mode
     midi.sendSysexMsg(PioneerDDJSX3.Serato_SYSEX1,PioneerDDJSX3.Serato_SYSEX1.length);
-    midi.sendSysexMsg(PioneerDDJSX3.Serato_SYSEX2,PioneerDDJSX3.Serato_SYSEX2.length);
 
     // create Serato keep-alive timer - required for white jog wheel spinner LEDs to work
     PioneerDDJSX3.keepaliveTimer=engine.beginTimer(250,"PioneerDDJSX3.keepSeratoalive",0);
@@ -514,6 +522,11 @@ PioneerDDJSX3.init = function(id) {
         this.inSetParameter(this.inGetParameter() + PioneerDDJSX3.getRotaryDelta(value) / 30);
     };
     PioneerDDJSX3.effectUnit[2].init();
+    
+    // synchronize Mixxx's controls to the Serato-certified controller's controls
+    if (PioneerDDJSX3.Serato_syncMixxxControls) {
+        midi.sendSysexMsg(PioneerDDJSX3.Serato_ControllerStatusDump,PioneerDDJSX3.Serato_ControllerStatusDump.length);
+    }
 };
 
 PioneerDDJSX3.shutdown = function() {
