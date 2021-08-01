@@ -16,20 +16,30 @@
         <controls>
             <control>
                 <group>[Master]</group>
-                <key>PioneerDDJSX3.crossfaderCurveKnobMSB</key>
-                <description>Crossfader Curve adjust (MSB), Knob: Frontpanel CROSSFADER CURVE</description>
-                <status>0xB6</status>
-                <midino>0x01</midino>
+                <key>PioneerDDJSX3.crossfaderSelector</key>
+                <description>Crossfader Curve adjust, Slide: Frontpanel CROSSFADER CURVE</description>
+                <status>0x96</status>
+                <midino>0x16</midino>
                 <options>
                     <script-binding/>
                 </options>
             </control>
             <control>
                 <group>[Master]</group>
-                <key>PioneerDDJSX3.crossfaderCurveKnobLSB</key>
-                <description>Crossfader Curve adjust (LSB), Knob: Frontpanel CROSSFADER CURVE</description>
-                <status>0xB6</status>
-                <midino>0x21</midino>
+                <key>PioneerDDJSX3.crossfaderSelector</key>
+                <description>Crossfader Curve adjust, Slide: Frontpanel CROSSFADER CURVE</description>
+                <status>0x96</status>
+                <midino>0x17</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+            <group>[Master]</group>
+                <key>PioneerDDJSX3.crossfaderSelector</key>
+                <description>Crossfader Curve adjust, Slide: Frontpanel CROSSFADER CURVE</description>
+                <status>0x96</status>
+                <midino>0x18</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -3606,7 +3616,7 @@
             </control>
              <control>
                 <group>[Channel3]</group>
-                <key>PioneerDDJSX3.wheelTouch</key>
+                <key>PioneerDDJSX3.jogTouch</key>
                 <description>Jog touch (No Vinyl Mode) Deck 3, left JOGDIAL (Deck 3 active)</description>
                 <status>0x92</status>
                 <midino>0x36</midino>
@@ -3616,7 +3626,7 @@
             </control>
             <control>
                 <group>[Channel3]</group>
-                <key>PioneerDDJSX3.wheelTouch</key>
+                <key>PioneerDDJSX3.jogTouch</key>
                 <description>Jog touch (Vinyl Mode) Deck 3, left JOGDIAL (Deck 3 active)</description>
                 <status>0x92</status>
                 <midino>0x36</midino>
@@ -3626,7 +3636,7 @@
             </control>
             <control>
                 <group>[Channel3]</group>
-                <key>PioneerDDJSX3.wheelTouch</key>
+                <key>PioneerDDJSX3.jogTouch</key>
                 <description>Jog shift touch Deck 3, SHIFT left JOGDIAL (Deck 3 active)</description>
                 <status>0x92</status>
                 <midino>0x67</midino>
@@ -5116,7 +5126,7 @@
             </control>
             <control>
                 <group>[Channel4]</group>
-                <key>PioneerDDJSX3.wheelTouch</key>
+                <key>PioneerDDJSX3.jogTouch</key>
                 <description>Jog touch (No Vinyl Mode) Deck 4, right JOGDIAL (Deck 4 active)</description>
                 <status>0x93</status>
                 <midino>0x36</midino>
@@ -5126,7 +5136,7 @@
             </control>
             <control>
                 <group>[Channel4]</group>
-                <key>PioneerDDJSX3.wheelTouch</key>
+                <key>PioneerDDJSX3.jogTouch</key>
                 <description>Jog touch (Vinyl Mode) Deck 4, right JOGDIAL (Deck 4 active)</description>
                 <status>0x93</status>
                 <midino>0x36</midino>
@@ -5136,7 +5146,7 @@
             </control>
             <control>
                 <group>[Channel4]</group>
-                <key>PioneerDDJSX3.wheelTouch</key>
+                <key>PioneerDDJSX3.jogTouch</key>
                 <description>Jog shift touch Deck 4, SHIFT right JOGDIAL (Deck 4 active)</description>
                 <status>0x93</status>
                 <midino>0x67</midino>

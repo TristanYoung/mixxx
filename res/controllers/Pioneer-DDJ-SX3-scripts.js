@@ -80,6 +80,18 @@ PioneerDDJSX3.defaultQuantize = [1, 1, 1, 1]; // quantize state
 PioneerDDJSX3.defaultFX1 = [1, 1, 1, 1];      // FX1 assignment
 PioneerDDJSX3.defaultFX2 = [1, 1, 1, 1];      // FX2 assignment
 
+// Set the crossfader values for slider positions 1, 2 and 3
+// Range for position 1, 2 and 3
+PioneerDDJSX3.crossfaderValue = [64, 32, 64];
+
+// Reverse crossfader (Hamster style) for scratching w/ crossfader selector
+// For each of the 3 crossfader selector positions
+PioneerDDJSX3.reverseCrossfader = [true, false, false];
+
+// Crossfader mode
+// For each of the crossfader selector positions: 0 = additive, 1 = constant power
+PioneerDDJSX3.crossfaderMode = [0, 1, 1];
+
 // Synchronize Mixxx's controls to the Serato-certified controller's controls upon startup
 PioneerDDJSX3.Serato_syncMixxxControls = true;
 
@@ -130,9 +142,6 @@ PioneerDDJSX3.Serato_ControllerStatusDump=[0xF0,0x00,0x20,0x7F,0x03,0x01,0xF7];
 
 // Keep controller in Serato mode
 PioneerDDJSX3.Serato_KEEPALIVE=[0xF0,0x00,0x20,0x7F,0x50,0x01,0xF7];
-
-
-PioneerDDJSX3.test=4;
 
 // Everything else
 PioneerDDJSX3.shiftPressed = false;
@@ -997,15 +1006,6 @@ PioneerDDJSX3.filterKnobLSB = function(channel, control, value, status, group) {
     engine.setParameter("[QuickEffectRack1_" + group + "]", "super1", fullValue / 0x3FFF);
 };
 
-PioneerDDJSX3.crossfaderCurveKnobMSB = function(channel, control, value, status, group) {
-    PioneerDDJSX3.highResMSB[group].crossfaderCurveKnob = value;
-};
-
-PioneerDDJSX3.crossfaderCurveKnobLSB = function(channel, control, value, status, group) {
-    var fullValue = (PioneerDDJSX3.highResMSB[group].crossfaderCurveKnob << 7) + value;
-    script.crossfaderCurve(fullValue, 0x00, 0x3FFF);
-};
-
 PioneerDDJSX3.samplerVolumeFaderMSB = function(channel, control, value, status, group) {
     PioneerDDJSX3.highResMSB[group].samplerVolumeFader = value;
 };
@@ -1030,6 +1030,28 @@ PioneerDDJSX3.crossFaderLSB = function(channel, control, value, status, group) {
 ///////////////////////////////////////////////////////////////
 //           SINGLE MESSAGE MIDI INPUT HANDLERS              //
 ///////////////////////////////////////////////////////////////
+
+
+// Crossfader curve selector
+PioneerDDJSX3.crossfaderSelector = function(channel, control, value, status, group) {
+    var position;
+    if (value > 0) {
+        if (control == 0x16) {
+            position = 0;
+        } else if (control == 0x17) {
+            position = 1;
+        }
+        else {
+            position = 2;
+        }
+        // Crossfader mode: additive or constant power
+        engine.setValue("[Mixer Profile]", "xFaderMode", PioneerDDJSX3.crossfaderMode[position]);
+        // Curve
+        engine.setValue("[Mixer Profile]", "xFaderCurve", PioneerDDJSX3.crossfaderValue[position]/16);
+        // Normal or reverse fader
+        engine.setValue("[Mixer Profile]", "xFaderReverse", PioneerDDJSX3.reverseCrossfader[position]);
+    }
+}
 
 PioneerDDJSX3.shiftButton = function(channel, control, value, status, group) {
     var index = 0;
