@@ -455,7 +455,7 @@ PioneerDDJSX3.init = function(id) {
 
     // change resonance of filter
 	for (var i=0; i<4; i++) {
-        engine.setValue("[QuickEffectRack1_[Channel"+i+1+"]_Effect1]","parameter2",PioneerDDJSX3.Resonance);
+        engine.setValue("[QuickEffectRack1_[Channel"+(i+1)+"]_Effect1]","parameter2",PioneerDDJSX3.Resonance);
     }
 
     // set Mixxx master gain, headphone gain, headphone mix
