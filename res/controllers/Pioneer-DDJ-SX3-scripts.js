@@ -545,6 +545,11 @@ PioneerDDJSX3.shutdown = function() {
     PioneerDDJSX3.resetDeck("[Channel4]");
 
     PioneerDDJSX3.resetNonDeckLeds();
+    
+    // stop timers
+    if (PioneerDDJSX3.keepaliveTimer) {
+        engine.stopTimer(PioneerDDJSX3.keepaliveTimer);
+    }
 };
 
 ///////////////////////////////////////////////////////////////
