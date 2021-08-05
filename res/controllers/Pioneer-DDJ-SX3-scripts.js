@@ -81,8 +81,9 @@ PioneerDDJSX3.defaultFX1 = [1, 1, 1, 1];      // FX1 assignment
 PioneerDDJSX3.defaultFX2 = [1, 1, 1, 1];      // FX2 assignment
 
 // Set the crossfader values for slider positions 1, 2 and 3
-// Range for position 1, 2 and 3
-PioneerDDJSX3.crossfaderValue = [64, 32, 64];
+// For position 1, 2 and 3
+// Mixxx->Preferences->Crossfader->Slider value range: 0.6 to 999.6
+PioneerDDJSX3.crossfaderValue = [47, 2, 4];
 
 // Reverse crossfader (Hamster style) for scratching w/ crossfader selector
 // For each of the 3 crossfader selector positions
@@ -1240,7 +1241,7 @@ PioneerDDJSX3.crossfaderSelector = function(channel, control, value, status, gro
         // Crossfader mode: additive or constant power
         engine.setValue("[Mixer Profile]", "xFaderMode", PioneerDDJSX3.crossfaderMode[position]);
         // Curve
-        engine.setValue("[Mixer Profile]", "xFaderCurve", PioneerDDJSX3.crossfaderValue[position]/16);
+        engine.setValue("[Mixer Profile]", "xFaderCurve", PioneerDDJSX3.crossfaderValue[position]);
         // Normal or reverse fader
         engine.setValue("[Mixer Profile]", "xFaderReverse", PioneerDDJSX3.reverseCrossfader[position]);
     }
