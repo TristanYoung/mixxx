@@ -726,17 +726,17 @@ PioneerDDJSX3.shutdown = function() {
         PioneerDDJSX3.resetPadLeds(i);
     }
     
+    // stop timers
+    if (PioneerDDJSX3.keepaliveTimer) {
+        engine.stopTimer(PioneerDDJSX3.keepaliveTimer);
+    }
+    
     PioneerDDJSX3.resetDeck("[Channel1]");
     PioneerDDJSX3.resetDeck("[Channel2]");
     PioneerDDJSX3.resetDeck("[Channel3]");
     PioneerDDJSX3.resetDeck("[Channel4]");
 
     PioneerDDJSX3.resetNonDeckLeds();
-    
-    // stop timers
-    if (PioneerDDJSX3.keepaliveTimer) {
-        engine.stopTimer(PioneerDDJSX3.keepaliveTimer);
-    }
 };
 
 
