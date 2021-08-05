@@ -11,7 +11,7 @@ var PioneerDDJSX3 = function() {};
 
 /*
     Author:         Tristan Young
-    Version:        1.0, 07/05/2021
+    Version:        1.1, 08/05/2021
     Description:    Pioneer DDJ-SX3 Controller Mapping for Mixxx
     Source:         https://github.com/TristanYoung/mixxx/tree/Pioneer-DDJ-SX3-Controller-Mapping
 
@@ -185,6 +185,69 @@ PioneerDDJSX3.activePadMode = [
 ];
 PioneerDDJSX3.samplerVelocityMode = [false, false, false, false];
 
+// PAD hotcue LED colors
+PioneerDDJSX3.hotCueColors = [0x2A, 0x25, 0x01, 0x1D, 0x15, 0x36, 0x08, 0x3d];  // set to [0x2A,0x24,0x01,0x1D,0x15,0x37,0x08,0x3A] for serato defaults
+PioneerDDJSX3.loopRollColors = [0x1C, 0x1C, 0x1C, 0x1C, 0x1C, 0x1C, 0x1C, 0x1C];
+PioneerDDJSX3.slicerColors = [0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01];
+PioneerDDJSX3.samplerColors = [0x2A, 0x25, 0x01, 0x1D, 0x15, 0x36, 0x08, 0x3d]; // copied from hotCueColors
+
+// Button/Pad LED illumination
+PioneerDDJSX3.controlLED = {
+    'lightOff': 0x3F,
+    'lightDim': 0x00,
+    'lightMedium': 0x40, // offset to the medium brightness range of colors
+    'lightWhite': 0x40,
+    
+    // array to store the flash state
+    flashState: [], // store the LED illumination state when flashing
+    flashTimer: [], // store the timer for the flashing button
+    
+    // flash control with two different colors
+    // onState and offState can be used to flash from bright/medium to dim, bright/medium to off, or bright to medium
+    // Note: dimmed pads cannot flash on and off, only to a brighter color.  It's not possible with the controller.
+    'flash': function (channel, control, onState, offState, flashRate, oneshot, enable) {
+        // start button/pad flash
+        if (enable) {
+            this.flashTimer[channel << 8 + control] = engine.beginTimer(flashRate, function() {this.doFlash(channel, control, onState, offState);}, oneshot);
+        } else
+        // stop button/pad flash
+        if (!enable) {
+            engine.stopTimer(this.flashTimer[channel << 8 + control]);
+            this.flashState[channel << 8 + control] = 0;
+            return (0);
+        }
+    },
+
+    // bright control with color
+    // use the standard color numbers 0x01 to 0x40
+    'bright': function (channel, control, color, enable) {
+        midi.sendShortMsg(channel, control, enable?color:this.lightOff);
+    },
+    
+    // medium bright control with color
+    // use the standard color numbers 0x01 to 0x40
+    'medium': function (channel, control, color, enable) {
+        midi.sendShortMsg(channel, control, enable?color+this.lightMedium:this.lightOff);
+    },
+        
+    // dim control
+    'dim': function (channel, control) {
+        midi.sendShortMsg(channel, control, this.lightDim);
+    },    
+    
+    // flash - change illumination state
+    'doFlash': function (channel, control, onState, offState) {
+        // Actual flashing
+        // onState and offState represent colors or dim to switch between
+        midi.sendShortMsg(channel, control, this.flashState[channel << 8 + control]?onState:offState);
+        if (this.flashState[channel << 8 + control]) {
+            this.flashState[channel << 8 + control] = 0;
+        } else {
+            this.flashState[channel << 8 + control] = 1;
+        }
+    }
+};
+
 // FX storage:
 PioneerDDJSX3.fxKnobMSBValue = [0, 0];
 PioneerDDJSX3.shiftFxKnobMSBValue = [0, 0];
@@ -291,6 +354,7 @@ PioneerDDJSX3.init = function(id) {
         '[EffectRack1_EffectUnit2_Effect3]': 0x02
     };
 
+
     PioneerDDJSX3.ledGroups = {
         'hotCue': 0x00,
         'loopRoll': 0x10,
@@ -299,7 +363,15 @@ PioneerDDJSX3.init = function(id) {
         'group1': 0x40,
         'group2': 0x50,
         'group3': 0x60,
-        'group4': 0x70
+        'group4': 0x70,
+        'hotCueShifted': 0x08,
+        'loopRollShifted': 0x18,
+        'slicerShifted': 0x28,
+        'samplerShifted': 0x38,
+        'group1Shifted': 0x48,
+        'beatloopShifted': 0x58,
+        'group3Shifted': 0x68,
+        'group4Shifted': 0x78
     };
 
     PioneerDDJSX3.nonPadLeds = {
@@ -531,14 +603,129 @@ PioneerDDJSX3.init = function(id) {
         this.inSetParameter(this.inGetParameter() + PioneerDDJSX3.getRotaryDelta(value) / 30);
     };
     PioneerDDJSX3.effectUnit[2].init();
-    
+
+    // PAD color setup - a hack to send the initial colors, until the PAD color code is ready to go
+    for (var i=0; i<4; i++) {
+        PioneerDDJSX3.initPadLeds(i);
+    }
+
     // synchronize Mixxx's controls to the Serato-certified controller's controls
     if (PioneerDDJSX3.Serato_syncMixxxControls) {
         midi.sendSysexMsg(PioneerDDJSX3.Serato_ControllerStatusDump,PioneerDDJSX3.Serato_ControllerStatusDump.length);
     }
 };
 
+PioneerDDJSX3.initPadLeds = function(deck) {
+        
+    // hotcue LED unshifted color, will sync with actual hotcue status, so no need to dim after setting
+    for (var i=0; i<8; i++) {
+        PioneerDDJSX3.controlLED.bright(0x97+deck, PioneerDDJSX3.ledGroups.hotCue+i, PioneerDDJSX3.hotCueColors[i], true);
+    }
+
+    // hotcue LED shifted color, will sync with actual hotcue status, so no need to dim after setting
+    for (var i=0; i<8; i++) {
+        PioneerDDJSX3.controlLED.bright(0x97+deck, PioneerDDJSX3.ledGroups.hotCueShifted+i, PioneerDDJSX3.hotCueColors[i], true);
+    }
+
+    // loopRoll LED color
+    for (var i=0; i<8; i++) {
+        PioneerDDJSX3.controlLED.bright(0x97+deck, PioneerDDJSX3.ledGroups.loopRoll+i, PioneerDDJSX3.loopRollColors[i], true);
+    }
+
+    // loopRoll LED shifted color
+    for (var i=0; i<8; i++) {
+        PioneerDDJSX3.controlLED.bright(0x97+deck, PioneerDDJSX3.ledGroups.loopRollShifted+i, PioneerDDJSX3.loopRollColors[i], true);
+    }
+
+    // slicer LED color
+    for (var i=0; i<8; i++) {
+        PioneerDDJSX3.controlLED.bright(0x97+deck, PioneerDDJSX3.ledGroups.slicer+i, PioneerDDJSX3.slicerColors[i], true);
+    }
+    
+    // slicer LED shifted color
+    for (var i=0; i<8; i++) {
+        PioneerDDJSX3.controlLED.bright(0x97+deck, PioneerDDJSX3.ledGroups.slicerShifted+i, PioneerDDJSX3.slicerColors[i], true);
+    }
+    
+    // slicer LED dim
+    for (var i=0; i<8; i++) {
+        PioneerDDJSX3.controlLED.dim(0x97+deck, PioneerDDJSX3.ledGroups.slicer+i);
+    }
+    
+    // slicer LED shifted dim
+    for (var i=0; i<8; i++) {
+        PioneerDDJSX3.controlLED.dim(0x97+deck, PioneerDDJSX3.ledGroups.slicerShifted+i);
+    }
+
+    // sampler LED color, will sync with actual sampler status, so no need to dim after setting
+    for (var i=0; i<8; i++) {
+        PioneerDDJSX3.controlLED.bright(0x97+deck, PioneerDDJSX3.ledGroups.sampler+i, PioneerDDJSX3.samplerColors[i], true);
+    }
+    
+    // sampler LED shifted color
+    for (var i=0; i<8; i++) {
+        PioneerDDJSX3.controlLED.bright(0x97+deck, PioneerDDJSX3.ledGroups.samplerShifted+i, PioneerDDJSX3.samplerColors[i], true);
+        PioneerDDJSX3.controlLED.dim(0x97+deck, PioneerDDJSX3.ledGroups.samplerShifted+i, PioneerDDJSX3.samplerColors[i], true);
+    }
+};
+
+PioneerDDJSX3.resetPadLeds = function(deck) {
+    // reset hotCue to white
+    for (var i=0; i<8; i++) {
+        PioneerDDJSX3.controlLED.bright(0x97+deck, PioneerDDJSX3.ledGroups.hotCue+i, PioneerDDJSX3.controlLED.lightWhite, true);
+        PioneerDDJSX3.controlLED.bright(0x97+deck, PioneerDDJSX3.ledGroups.hotCueShifted+i, PioneerDDJSX3.controlLED.lightWhite, true); // shifted
+    }
+
+    // dim hotCue
+    for (var i=0; i<8; i++) {
+        PioneerDDJSX3.controlLED.dim(0x97+deck, PioneerDDJSX3.ledGroups.hotCue+i);
+        PioneerDDJSX3.controlLED.dim(0x97+deck, PioneerDDJSX3.ledGroups.hotCueShifted+i); // shifted
+    }
+
+    // reset loopRoll to white
+    for (var i=0; i<8; i++) {
+        PioneerDDJSX3.controlLED.bright(0x97+deck, PioneerDDJSX3.ledGroups.loopRoll+i, PioneerDDJSX3.controlLED.lightWhite, true);
+        PioneerDDJSX3.controlLED.bright(0x97+deck, PioneerDDJSX3.ledGroups.loopRollShifted+i, PioneerDDJSX3.controlLED.lightWhite, true); // shifted
+    }
+
+    // dim loopRoll
+    for (var i=0; i<8; i++) {
+        PioneerDDJSX3.controlLED.dim(0x97+deck, PioneerDDJSX3.ledGroups.loopRoll+i);
+        PioneerDDJSX3.controlLED.dim(0x97+deck, PioneerDDJSX3.ledGroups.loopRollShifted+i); // shifted
+    }
+
+    // reset slicer to white
+    for (var i=0; i<8; i++) {
+        PioneerDDJSX3.controlLED.bright(0x97+deck, PioneerDDJSX3.ledGroups.slicer+i, PioneerDDJSX3.controlLED.lightWhite, true);
+        PioneerDDJSX3.controlLED.bright(0x97+deck, PioneerDDJSX3.ledGroups.slicerShifted+i, PioneerDDJSX3.controlLED.lightWhite, true); // shifted
+    }
+
+    // dim slicer
+    for (var i=0; i<8; i++) {
+        PioneerDDJSX3.controlLED.dim(0x97+deck, PioneerDDJSX3.ledGroups.slicer+i);
+        PioneerDDJSX3.controlLED.dim(0x97+deck, PioneerDDJSX3.ledGroups.slicerShifted+i); // shifted
+    }
+
+    // reset sampler to white
+    for (var i=0; i<8; i++) {
+        PioneerDDJSX3.controlLED.bright(0x97+deck, PioneerDDJSX3.ledGroups.sampler+i, PioneerDDJSX3.controlLED.lightWhite, true);
+        PioneerDDJSX3.controlLED.bright(0x97+deck, PioneerDDJSX3.ledGroups.samplerShifted+i, PioneerDDJSX3.controlLED.lightWhite, true); // shifted
+    }
+
+    // dim sampler
+    for (var i=0; i<8; i++) {
+        PioneerDDJSX3.controlLED.dim(0x97+deck, PioneerDDJSX3.ledGroups.sampler+i);
+        PioneerDDJSX3.controlLED.dim(0x97+deck, PioneerDDJSX3.ledGroups.samplerShifted+i); // shifted
+    }
+};
+
+
 PioneerDDJSX3.shutdown = function() {
+    // clear pad Leds, must be called before resetDeck
+    for (var i=0; i<4; i++) {
+        PioneerDDJSX3.resetPadLeds(i);
+    }
+    
     PioneerDDJSX3.resetDeck("[Channel1]");
     PioneerDDJSX3.resetDeck("[Channel2]");
     PioneerDDJSX3.resetDeck("[Channel3]");
@@ -551,6 +738,7 @@ PioneerDDJSX3.shutdown = function() {
         engine.stopTimer(PioneerDDJSX3.keepaliveTimer);
     }
 };
+
 
 ///////////////////////////////////////////////////////////////
 //                   Serato Keep-alive                       //
@@ -1909,14 +2097,33 @@ PioneerDDJSX3.fxLedControl = function(unit, ledNumber, shift, active) {
 PioneerDDJSX3.padLedControl = function(deck, groupNumber, ledNumber, shift, active) {
     var padLedsBaseChannel = 0x97,
         padLedControl = (shift ? 0x08 : 0x00) + groupNumber + ledNumber,
-        midiChannelOffset = PioneerDDJSX3.deckConverter(deck);
+        midiChannelOffset = PioneerDDJSX3.deckConverter(deck),
+        color = 0x00,
+        dim = 0x00;
 
     if (midiChannelOffset !== null) {
+        if (PioneerDDJSX3.activePadMode[midiChannelOffset] === PioneerDDJSX3.padModes.hotCue){
+            // set hotcue colors or dim
+            color = PioneerDDJSX3.hotCueColors[ledNumber];
+        } else if (PioneerDDJSX3.activePadMode[midiChannelOffset] === PioneerDDJSX3.padModes.loopRoll){
+            // set roll colors or dim
+            color = PioneerDDJSX3.loopRollColors[ledNumber];
+            if (active) {
+                dim = color;
+            }
+        } else if (PioneerDDJSX3.activePadMode[midiChannelOffset] === PioneerDDJSX3.padModes.slicer){
+             // set slicer colors or dim
+             color = PioneerDDJSX3.slicerColors[ledNumber];
+        } else if (PioneerDDJSX3.activePadMode[midiChannelOffset] === PioneerDDJSX3.padModes.sampler){
+            // set sampler colors or dim
+            color = PioneerDDJSX3.samplerColors[ledNumber];
+        }
+        
         midi.sendShortMsg(
             padLedsBaseChannel + midiChannelOffset,
             padLedControl,
-            active ? 0x7F : 0x00
-        );
+            active ? color : dim
+            );
     }
 };
 
