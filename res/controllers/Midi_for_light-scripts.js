@@ -79,6 +79,8 @@ var deckScore = [
 // Which control was last used, for score tie-breaker
 var lastusedControl = 0;
 
+// Track when points have been updated
+var pointsUpdated = false;
 
 ///////////////////////////////////////////////////////////////
 //                         FUNCTIONS                         //
@@ -169,6 +171,8 @@ midi_for_light.deckFaderChange = function(value, group, control) { // called whe
         deckScore[i][4] = 0; // reset points on all controls
     }
     deckScore[deck][4] = 1; // one point awarded for last control used
+    
+    pointsUpdated = true;
 };
 
 // Crossfader position scoring
@@ -226,6 +230,8 @@ midi_for_light.crossfaderChange = function(value, group, control) { // called wh
         deckScore[2][1] = 0;
         deckScore[3][1] = 0;
     }
+    
+    pointsUpdated = true;
 };
 
 // Deck playing scoring
@@ -238,6 +244,8 @@ midi_for_light.deckButtonPlay = function(value, group, control) {
     } else {
         deckScore[deck][2] = 0;          // deck is not playing
     }
+    
+    pointsUpdated = true;
 };
 
 // Dec master sync scoring
@@ -250,6 +258,8 @@ midi_for_light.deckButtonSync = function(value, group, control) {
     } else {
         deckScore[deck][3] = 0;          // master sync is disabled on deck
     }
+    
+    pointsUpdated = true;
 };
 
 // calculate score to determine most likely active deck, and set active
@@ -258,24 +268,28 @@ midi_for_light.calculatedeckScore  = function(value, group, control) {
     var highscore = -1;    // highest score
     var prioritydeck = -1; // deck with the highest score takes priority
     
-    for (i=0; i<4; i++){
-        for (j=0; j<5; j++){
-            score[i] += deckScore[i][j];
+    // Calculate score if points have changed
+    if (pointsUpdated) {
+        for (i=0; i<4; i++){
+            for (j=0; j<5; j++){
+                score[i] += deckScore[i][j];
+                }
+            if (score[i] > highscore) { // tends to give lower numbered decks increased score weight
+                highscore = score[i];
+                prioritydeck = i;
             }
-        if (score[i] > highscore) { // tends to give lower numbered decks increased score weight
-            highscore = score[i];
-            prioritydeck = i;
+        }
+
+        // set deck active for midi for light
+        if (midi_for_light.deck_current != prioritydeck){
+            midi_for_light.deck_current = prioritydeck; // set current deck to deck with the highest score
+            midi.sendShortMsg(0x8F + midi_channel, 0x30, 0x00 + midi_for_light.deck_current); // note C on with value 0 + deck
+            midi.sendShortMsg(0x7F + midi_channel, 0x30, 0x00 + midi_for_light.deck_current); // note C off with value 0 + deck
         }
     }
-
-    print("Midi for Light: deck priority " + prioritydeck);
-
-    // set deck active for midi for light
-    if (midi_for_light.deck_current != prioritydeck){
-        midi_for_light.deck_current = prioritydeck; // set current deck to deck with the highest score
-        midi.sendShortMsg(0x8F + midi_channel, 0x30, 0x00 + midi_for_light.deck_current); // note C on with value 0 + deck
-        midi.sendShortMsg(0x7F + midi_channel, 0x30, 0x00 + midi_for_light.deck_current); // note C off with value 0 + deck
-    }
+    
+    pointsUpdated = false;
+    
 };
 
 
