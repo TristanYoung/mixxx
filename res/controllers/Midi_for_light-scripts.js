@@ -114,6 +114,9 @@ midi_for_light.init = function(id) { // called when the MIDI device is opened & 
         engine.connectControl("[Channel" + (i + 1) + "]", "sync_enabled", "midi_for_light.deckButtonSync");
         engine.connectControl("[Master]", "crossfader", "midi_for_light.crossfaderChange");
 
+        /////////////////////////////
+        //  PROPOSED FOR DELETION
+        ////////////////////////////
         //engine.connectControl("[Channel" + (i + 1) + "]", "volume", "midi_for_light.deckVolumeChange");
         //engine.connectControl("[Channel" + (i + 1) + "]", "play", "midi_for_light.deckButtonPlay");
 
@@ -281,7 +284,7 @@ midi_for_light.calculatedeckScore  = function(value, group, control) {
 ////////////////////////////
 // PROPOSED FOR DELETION 
 ///////////////////////////
-midi_for_light.deckButtonPlay2 = function(value, group, control) { // called when click a play button
+/* midi_for_light.deckButtonPlay2 = function(value, group, control) { // called when click a play button
     var deck = parseInt(group.substring(8, 9)) - 1;
 
     if (value == 1) { // deck play on
@@ -301,7 +304,7 @@ midi_for_light.deckButtonPlay2 = function(value, group, control) { // called whe
     } else {
         midi_for_light.crossfaderChange2();
     }
-};
+}; */
 
 midi_for_light.deckBeatWatchdog = function(deck) { //  if current deck beat lost without reason, search a new current deck   
     engine.stopTimer(deck_beat_watchdog_timer[deck]);
@@ -566,7 +569,7 @@ midi_for_light.vuMeter = function() { // read, calculate and send vu-meter value
 /////////////////////////////
 //  PROPOSED FOR DELETION
 ////////////////////////////
-midi_for_light.deckVolumeChange = function(value, group, control) { // deck volume changed
+/* midi_for_light.deckVolumeChange = function(value, group, control) { // deck volume changed
     if (midi_for_light.volumebeat === false) return; // out if volumebeat is not active
     if (midi_for_light.volumeBeatBlockStatus === true) return; // out if volumebeat is blocked
 
@@ -599,7 +602,7 @@ var deckmaxvolumecount = 0; // how many decks are at maximum volume count
             midi_for_light.volumeBeatBlock_timer = engine.beginTimer(1000, "midi_for_light.volumeBeatBlock()");
         }
     }
-};
+}; */
 
 midi_for_light.volumeBeatBlock = function() { // prevent deck change for one second
     engine.stopTimer(midi_for_light.volumeBeatBlock_timer);
@@ -613,7 +616,10 @@ midi_for_light.volumeBeatOnDelay = function() { // allow deck change with volume
     midi_for_light.volumebeat = true;
 };
 
-midi_for_light.crossfaderChange2 = function() { // crossfader chenge, check deck change
+/////////////////////////////
+//  PROPOSED FOR DELETION
+////////////////////////////
+/* midi_for_light.crossfaderChange2 = function() { // crossfader chenge, check deck change
     // if fader prevent, go out
     if (midi_for_light.crossfader_block === true) return;
 
@@ -650,15 +656,18 @@ midi_for_light.crossfaderChange2 = function() { // crossfader chenge, check deck
         midi_for_light.crossfader_block = true;
         midi_for_light.crossfader_change_block_timer = engine.beginTimer(1000, "midi_for_light.crossfaderChangeBlock()");
     }
-};
+}; */
 
-midi_for_light.crossfaderChangeBlock = function() { // prevent deck change for one second
+/////////////////////////////
+//  PROPOSED FOR DELETION
+////////////////////////////
+/* midi_for_light.crossfaderChangeBlock = function() { // prevent deck change for one second
     engine.stopTimer(midi_for_light.crossfader_change_block_timer);
     midi_for_light.crossfader_block = false;
     midi.sendShortMsg(0x8F + midi_channel, 0x30, 0x0); // note C on with value 0
     midi.sendShortMsg(0x7F + midi_channel, 0x30, 0x0); // note C off with value 0
     midi_for_light.crossfaderChange2(); // check deck is current
-};
+}; */
 
 midi_for_light.sendMidiMtcFullFrame = function(value, group, control) { // sends an MTC full frame
     var deck = parseInt(group.substring(8, 9)) - 1;
