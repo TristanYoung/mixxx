@@ -582,10 +582,9 @@ var deckmaxvolumecount = 0; // how many decks are at maximum volume count
         if (deckvolume[z] > 0 && deckvolume[z] >= volumemax && beat_watchdog[z] === false) {
             volumemax = deckvolume[z];
             deckneu = z;
-            }
         }
     }
-
+    
     if (deckneu == -1) return; // out if no new valid deck
 
     // check deck change and send change message
