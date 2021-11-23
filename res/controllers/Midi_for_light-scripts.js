@@ -16,31 +16,32 @@ function midi_for_light() {}
 ///////////////////////////////////////////////////////////////
 //                       USER OPTIONS                        //
 ///////////////////////////////////////////////////////////////
-var midi_channel = 1; // set midi_channel. Valid range: 1 to 16.
+var midi_channel = 1; // set midi_channel. Valid range: 1 to 16.  
 var enable_beat = true; // set to false if you not need beat
-var enable_bpm = true; // set to false if you not need BPM
+var enable_bpm = false; // set to false if you not need BPM
 var enable_mtc_timecode = false; // set to false if you not need midi time code
-var enable_vu_mono_current = false; // set to false if you not need VU mono current
-var enable_vu_mono_average_min = false; // set to false if you not need VU mono average min
+var enable_vu_mono_current = false; // set to false if you not need VU mono current 
+var enable_vu_mono_average_min = false; // set to false if you not need VU mono average min 
 var enable_vu_mono_average_mid = false; // set to false if you not need VU mono average mid
 var enable_vu_mono_average_max = false; // set to false if you not need VU mono average max
-var enable_vu_mono_average_fit = true; // set to false if you not need VU mono average fit
+var enable_vu_mono_average_fit = false; // set to false if you not need VU mono average fit
 var enable_vu_mono_current_meter = false; // set to false if you not need VU mono current meter
-var enable_vu_mono_average_meter = true; // set to false if you not need VU mono average meter
-var enable_vu_left_current = false; // set to false if you not need VU left current
-var enable_vu_left_average_min = false; // set to false if you not need VU left average min
-var enable_vu_left_average_mid = false; // set to false if you not need VU left average mid
-var enable_vu_left_average_max = false; // set to false if you not need VU left average max
-var enable_vu_left_average_fit = true; // set to false if you not need VU left average fit
+var enable_vu_mono_average_meter = false; // set to false if you not need VU mono average meter
+var enable_vu_left_current = false; // set to false if you not need VU left current 
+var enable_vu_left_average_min = false; // set to false if you not need VU left average min 
+var enable_vu_left_average_mid = false; // set to false if you not need VU left average mid 
+var enable_vu_left_average_max = false; // set to false if you not need VU left average max 
+var enable_vu_left_average_fit = false; // set to false if you not need VU left average fit 
 var enable_vu_left_current_meter = false; // set to false if you not need VU left current meter
 var enable_vu_left_average_meter = false; // set to false if you not need VU left average meter
-var enable_vu_right_current = false; // set to false if you not need VU right current
-var enable_vu_right_average_min = false; // set to false if you not need VU right average min
-var enable_vu_right_average_mid = false; // set to false if you not need VU right average mid
-var enable_vu_right_average_max = false; // set to false if you not need VU right average max
-var enable_vu_right_average_fit = true; // set to false if you not need VU right average fit
+var enable_vu_right_current = false; // set to false if you not need VU right current 
+var enable_vu_right_average_min = false; // set to false if you not need VU right average min 
+var enable_vu_right_average_mid = false; // set to false if you not need VU right average mid 
+var enable_vu_right_average_max = false; // set to false if you not need VU right average max 
+var enable_vu_right_average_fit = false; // set to false if you not need VU right average fit 
 var enable_vu_right_current_meter = false; // set to false if you not need VU right current meter
 var enable_vu_right_average_meter = false; // set to false if you not need VU right average meter
+var crossfader_deadzone = .1; // increase number to increase the crossfader centre deadzone, valid numbers are 0 through 1
 
 ///////////////////////////////////////////////////////////////
 //              GLOBAL FOR SCRIPT, DON'T TOUCH               //
@@ -66,23 +67,38 @@ if (enable_vu_mono_current === true || enable_vu_mono_average_min === true || en
     var enable_vu_meter_global = false; // set to false if you not need complete VU-Meter
 }
 
+// Deck Score, used to determine active deck for midi output.
+// Score columns: [0] deck fader position, [1] cross fader position, [2] deck playing, [3] deck master sync, [4] last control used
+var deckScore = [
+    [0,0,0,0,0],
+    [0,0,0,0,0],
+    [0,0,0,0,0],
+    [0,0,0,0,0]
+    ];;
+
+// Which control was last used, for score tie-breaker
+var lastusedControl = 0;
+
+
 ///////////////////////////////////////////////////////////////
 //                         FUNCTIONS                         //
 ///////////////////////////////////////////////////////////////
 
-midi_for_light.init = function(id) { // called when the MIDI device is opened & set up
+midi_for_light.init = function(id) { // called when the MIDI device is opened & set up   
     midi_for_light.id = id; // store the ID of this device for later use
     midi_for_light.directory_mode = false;
     midi_for_light.deck_current = 0;
     midi_for_light.crossfader_block = false;
-    midi_for_light.crossfader_change_block_timer = [-1, -1];
+    midi_for_light.crossfader_change_block_timer = -1; //[-1, -1];  Why was this an array?  Modified by Tristan
     midi_for_light.volumebeat = false;
     midi_for_light.volumeBeatBlockStatus = false;
     midi_for_light.volumeBeatBlock_timer = [-1, -1];
     midi_for_light.vu_meter_timer = [-1, -1];
     midi_for_light.volumebeat_on_delay_timer = [-1, -1];
+    midi_for_light.scoreTimer = 0;          // timer for periodic scoring
+    midi_for_light.scoreTimerPeriod = 1000; // wait time between calculating score
 
-    engine.connectControl("[Master]", "crossfader", "midi_for_light.crossfaderChange");
+    //engine.connectControl("[Master]", "crossfader", "midi_for_light.crossfaderChange");
 
     if (enable_vu_meter_global === true) midi_for_light.vu_meter_timer = engine.beginTimer(40, "midi_for_light.vuMeter()");
 
@@ -93,26 +109,179 @@ midi_for_light.init = function(id) { // called when the MIDI device is opened & 
     for (var i = 0; i <= 3; i++) {
         deck_beat_watchdog_timer[i] = engine.beginTimer(beat_watchdog_time, "midi_for_light.deckBeatWatchdog(" + i + ")");
         engine.connectControl("[Channel" + (i + 1) + "]", "beat_active", "midi_for_light.deckBeatOutputToMidi");
-        engine.connectControl("[Channel" + (i + 1) + "]", "volume", "midi_for_light.deckVolumeChange");
+        engine.connectControl("[Channel" + (i + 1) + "]", "volume", "midi_for_light.deckFaderChange");
         engine.connectControl("[Channel" + (i + 1) + "]", "play", "midi_for_light.deckButtonPlay");
+        engine.connectControl("[Channel" + (i + 1) + "]", "sync_enabled", "midi_for_light.deckButtonSync");
+        engine.connectControl("[Master]", "crossfader", "midi_for_light.crossfaderChange");
+
+        //engine.connectControl("[Channel" + (i + 1) + "]", "volume", "midi_for_light.deckVolumeChange");
+        //engine.connectControl("[Channel" + (i + 1) + "]", "play", "midi_for_light.deckButtonPlay");
+
         if (enable_mtc_timecode === true) engine.connectControl("[Channel" + (i + 1) + "]", "playposition", "midi_for_light.sendMidiMtcFullFrame");
     }
 
-    midi_for_light.crossfaderChange();
+    // initialize scoring system
+    midi_for_light.deckFaderChange(0,"[Channel1]",0);
+    midi_for_light.deckFaderChange(0,"[Channel2]",0);
+    midi_for_light.deckFaderChange(0,"[Channel3]",0);
+    midi_for_light.deckFaderChange(0,"[Channel4]",0);
+    midi_for_light.crossfaderChange(0,"[Master]",0);
+    midi_for_light.crossfaderChange(0,"[Master]",0);
+    midi_for_light.crossfaderChange(0,"[Master]",0);
+    midi_for_light.crossfaderChange(0,"[Master]",0);
+    midi_for_light.deckButtonPlay(0,"[Channel1]",0);
+    midi_for_light.deckButtonPlay(0,"[Channel2]",0);
+    midi_for_light.deckButtonPlay(0,"[Channel3]",0);
+    midi_for_light.deckButtonPlay(0,"[Channel4]",0);
+    midi_for_light.deckButtonSync(0,"[Channel1]",0);
+    midi_for_light.deckButtonSync(0,"[Channel2]",0);
+    midi_for_light.deckButtonSync(0,"[Channel3]",0);
+    midi_for_light.deckButtonSync(0,"[Channel4]",0);
+
+    midi_for_light.scoreTimer = engine.beginTimer(midi_for_light.scoreTimerPeriod, "midi_for_light.calculatedeckScore");
 };
 
 midi_for_light.shutdown = function(id) { // called when the MIDI device is closed
-    engine.stopTimer(midi_for_light.deck_beat_watchdog_timer[0]);
-    engine.stopTimer(midi_for_light.deck_beat_watchdog_timer[1]);
-    engine.stopTimer(midi_for_light.deck_beat_watchdog_timer[2]);
-    engine.stopTimer(midi_for_light.deck_beat_watchdog_timer[3]);
+    
+    engine.stopTimer(deck_beat_watchdog_timer[0]);
+    engine.stopTimer(deck_beat_watchdog_timer[1]);
+    engine.stopTimer(deck_beat_watchdog_timer[2]);
+    engine.stopTimer(deck_beat_watchdog_timer[3]);
+    
+    engine.stopTimer(midi_for_light.scoreTimer);
     engine.stopTimer(midi_for_light.vu_meter_timer);
     engine.stopTimer(midi_for_light.volumeBeatBlock_timer);
     engine.stopTimer(midi_for_light.crossfader_change_block_timer);
     engine.stopTimer(midi_for_light.volumebeat_on_delay_timer);
 };
 
-midi_for_light.deckButtonPlay = function(value, group, control) { // called when click a play button
+// Deck fader position scoring
+midi_for_light.deckFaderChange = function(value, group, control) { // called when deck fader is moved
+    var deck = parseInt(group.substring(8, 9)) - 1;
+    var pointValue = 0; // change this to increase awarded points from base fader position
+
+    deckScore[deck][0] = engine.getValue("[Channel" + (deck + 1) + "]", "volume") + pointValue; // fader position = point between 0 and 1 and add additional points
+
+    for (i=0; i<4; i++){
+        deckScore[i][4] = 0; // reset points on all controls
+    }
+    deckScore[deck][4] = 1; // one point awarded for last control used
+};
+
+// Crossfader position scoring
+midi_for_light.crossfaderChange = function(value, group, control) { // called when deck fader is moved
+    var pointValue = 0; // change this to increase awarded points from base crossfader position
+    var crossfaderValue = engine.getValue("[Master]", "crossfader"); // crossfader position
+
+    // crossfader deadzone calculation
+    if (crossfaderValue >= -crossfader_deadzone && crossfaderValue <= crossfader_deadzone){
+        crossfaderValue = 0;
+    }
+   
+    
+    if (crossfaderValue < 0) { // crossfader tot he left of centre, points are between 0 and 1
+        //award points for active fader, unary to make score positive
+        deckScore[0][1] = -crossfaderValue * pointValue;
+        deckScore[2][1] = -crossfaderValue * pointValue;
+        
+        // no points to other decks
+        deckScore[1][1] = 0;
+        deckScore[3][1] = 0;
+            
+        // last control used, award points for active side
+        deckScore[0][4] = 1;
+        deckScore[2][4] = 1;
+
+        // last control used, no points for inactive side
+        deckScore[1][4] = 0;
+        deckScore[3][4] = 0;
+    }
+    
+    if (crossfaderValue > 0) { // crossfader to the right of centre, points are between 0 and 1
+        // award points for active fader position
+        deckScore[1][1] = crossfaderValue * pointValue;
+        deckScore[3][1] = crossfaderValue * pointValue;
+        
+        // no points to other decks
+        deckScore[0][1] = 0;
+        deckScore[2][1] = 0;
+        
+        // last control used, award points for active side
+        deckScore[1][4] = 1;
+        deckScore[3][4] = 1;
+
+        // last control used, no points for inactive side
+        deckScore[0][4] = 0;
+        deckScore[2][4] = 0;
+        
+    }
+    
+    if (crossfaderValue = 0) {
+        // fader position centred, no points
+        deckScore[0][1] = 0;
+        deckScore[1][1] = 0;
+        deckScore[2][1] = 0;
+        deckScore[3][1] = 0;
+    }
+};
+
+// Deck playing scoring
+midi_for_light.deckButtonPlay = function(value, group, control) {
+    var deck = parseInt(group.substring(8, 9)) - 1;
+    var pointValue = 2; // change this to increase awarded points
+
+    if (engine.getValue("[Channel" + (deck + 1) + "]", "play_latched")) {
+        deckScore[deck][2] = pointValue; // deck is playing 
+    } else {
+        deckScore[deck][2] = 0;          // deck is not playing
+    }
+};
+
+// Dec master sync scoring
+midi_for_light.deckButtonSync = function(value, group, control) {
+    var deck = parseInt(group.substring(8, 9)) - 1;
+    var pointValue = 2; // change this to increase awarded points
+
+    if (engine.getValue("[Channel" + (deck + 1) + "]", "sync_master")) {
+        deckScore[deck][3] = pointValue; // master sync is enabled on deck
+    } else {
+        deckScore[deck][3] = 0;          // master sync is disabled on deck
+    }
+};
+
+// calculate score to determine most likely active deck, and set active
+midi_for_light.calculatedeckScore  = function(value, group, control) {
+    var score = [0,0,0,0]; // score per deck
+    var highscore = -1;    // highest score
+    var prioritydeck = -1; // deck with the highest score takes priority
+    
+    for (i=0; i<4; i++){
+        for (j=0; j<5; j++){
+            score[i] += deckScore[i][j];
+            }
+        if (score[i] > highscore) { // tends to give lower numbered decks increased score weight
+            highscore = score[i];
+            prioritydeck = i;
+        }
+    }
+
+    print("Midi for Light: deck priority " + prioritydeck);
+
+    // set deck active for midi for light
+    if (midi_for_light.deck_current != prioritydeck){
+        midi_for_light.deck_current = prioritydeck; // set current deck to deck with the highest score
+        midi.sendShortMsg(0x8F + midi_channel, 0x30, 0x00 + midi_for_light.deck_current); // note C on with value 0 + deck
+        midi.sendShortMsg(0x7F + midi_channel, 0x30, 0x00 + midi_for_light.deck_current); // note C off with value 0 + deck
+    }
+};
+
+
+
+
+////////////////////////////
+// PROPOSED FOR DELETION 
+///////////////////////////
+midi_for_light.deckButtonPlay2 = function(value, group, control) { // called when click a play button
     var deck = parseInt(group.substring(8, 9)) - 1;
 
     if (value == 1) { // deck play on
@@ -120,19 +289,21 @@ midi_for_light.deckButtonPlay = function(value, group, control) { // called when
         beat_watchdog[deck] = false;
         deck_beat_watchdog_timer[deck] = engine.beginTimer(beat_watchdog_time, "midi_for_light.deckBeatWatchdog(" + deck + ")");
     } else { // deck play stop
-        engine.stopTimer(deck_beat_watchdog_timer[deck]);
+        if (deck_beat_watchdog_timer[deck]) {
+            engine.stopTimer(deck_beat_watchdog_timer[deck]);
+            deck_beat_watchdog_timer[deck]=false;
+        }
         beat_watchdog[deck] = true;
     }
 
     if (midi_for_light.volumebeat === true) {
         midi_for_light.deckVolumeChange();
     } else {
-        midi_for_light.crossfaderChange();
+        midi_for_light.crossfaderChange2();
     }
-
 };
 
-midi_for_light.deckBeatWatchdog = function(deck) { //  if current deck beat lost without reason, search a new current deck
+midi_for_light.deckBeatWatchdog = function(deck) { //  if current deck beat lost without reason, search a new current deck   
     engine.stopTimer(deck_beat_watchdog_timer[deck]);
     beat_watchdog[deck] = true;
     if (midi_for_light.volumebeat === false) midi_for_light.crossfaderChange();
@@ -149,7 +320,7 @@ midi_for_light.vuMeter = function() { // read, calculate and send vu-meter value
     var vu_left_current = engine.getValue("[Master]", "VuMeterL");
     var vu_right_current = engine.getValue("[Master]", "VuMeterR");
 
-    // arraycounter
+    // arraycounter 
     vu_array_fill_counter++;
     if (vu_array_fill_counter > vu_array_fill_maximum) {
         vu_array_fill_counter = 1;
@@ -391,6 +562,10 @@ midi_for_light.vuMeter = function() { // read, calculate and send vu-meter value
     }
 };
 
+
+/////////////////////////////
+//  PROPOSED FOR DELETION
+////////////////////////////
 midi_for_light.deckVolumeChange = function(value, group, control) { // deck volume changed
     if (midi_for_light.volumebeat === false) return; // out if volumebeat is not active
     if (midi_for_light.volumeBeatBlockStatus === true) return; // out if volumebeat is blocked
@@ -398,14 +573,16 @@ midi_for_light.deckVolumeChange = function(value, group, control) { // deck volu
     var deckvolume = new Array(0, 0, 0, 0);
     var volumemax = 0;
     var deckneu = -1;
+var deckmaxvolumecount = 0; // how many decks are at maximum volume count
 
     // get volume from the decks and check it for use
     for (var z = 0; z <= 3; z++) {
         deckvolume[z] = engine.getValue("[Channel" + (z + 1) + "]", "volume");
         print("beat_watchdog " + z + ": " + beat_watchdog[z]);
-        if (deckvolume[z] > 0 && deckvolume[z] > volumemax && beat_watchdog[z] === false) {
+        if (deckvolume[z] > 0 && deckvolume[z] >= volumemax && beat_watchdog[z] === false) {
             volumemax = deckvolume[z];
             deckneu = z;
+            }
         }
     }
 
@@ -413,10 +590,15 @@ midi_for_light.deckVolumeChange = function(value, group, control) { // deck volu
 
     // check deck change and send change message
     if (deckneu != midi_for_light.deck_current) {
-        midi_for_light.deck_current = deckneu;
-        midi.sendShortMsg(0x8F + midi_channel, 0x30, 0x64 + deckneu); // Note C on with 64 and add deck
-        midi_for_light.volumeBeatBlockStatus = true;
-        midi_for_light.volumeBeatBlock_timer = engine.beginTimer(1000, "midi_for_light.volumeBeatBlock()");
+        if (deckmaxvolumecount > 1){
+            midi_for_light.crossfaderChange2();
+        }
+        else {
+            midi_for_light.deck_current = deckneu;
+            midi.sendShortMsg(0x8F + midi_channel, 0x30, 0x64 + deckneu); // Note C on with 64 and add deck
+            midi_for_light.volumeBeatBlockStatus = true;
+            midi_for_light.volumeBeatBlock_timer = engine.beginTimer(1000, "midi_for_light.volumeBeatBlock()");
+        }
     }
 };
 
@@ -432,13 +614,17 @@ midi_for_light.volumeBeatOnDelay = function() { // allow deck change with volume
     midi_for_light.volumebeat = true;
 };
 
-midi_for_light.crossfaderChange = function() { // crossfader chenge, check deck change
+midi_for_light.crossfaderChange2 = function() { // crossfader chenge, check deck change
     // if fader prevent, go out
     if (midi_for_light.crossfader_block === true) return;
 
     // check changing to "deck change by volume" method
     midi_for_light.volumebeat = false;
-    engine.stopTimer(midi_for_light.volumebeat_on_delay_timer);
+    if (midi_for_light.volumebeat_on_delay_timer) {
+        engine.stopTimer(midi_for_light.volumebeat_on_delay_timer);
+        midi_for_light.volumebeat_on_delay_timer = false;
+    }
+    
     if (engine.getValue("[Master]", "crossfader") > -0.25) { // crossfader more than 25% left;
         if (engine.getValue("[Master]", "crossfader") < 0.25) { // crossfader more then 25% right;
             midi_for_light.volumebeat_on_delay_timer = engine.beginTimer(3000, "midi_for_light.volumeBeatOnDelay()");
@@ -472,7 +658,7 @@ midi_for_light.crossfaderChangeBlock = function() { // prevent deck change for o
     midi_for_light.crossfader_block = false;
     midi.sendShortMsg(0x8F + midi_channel, 0x30, 0x0); // note C on with value 0
     midi.sendShortMsg(0x7F + midi_channel, 0x30, 0x0); // note C off with value 0
-    midi_for_light.crossfaderChange(); // check deck is current
+    midi_for_light.crossfaderChange2(); // check deck is current
 };
 
 midi_for_light.sendMidiMtcFullFrame = function(value, group, control) { // sends an MTC full frame
@@ -515,14 +701,17 @@ midi_for_light.deckBeatOutputToMidi = function(value, group, control) { // send 
     if (deck_bpm >= 127) deck_bpm = 127;
 
     if (midi_for_light.deck_current == deck) { // only when its the correct deck
-        if (value) { // beat is on, sending note on
-            if (enable_beat === true) midi.sendShortMsg(0x8F + midi_channel, 0x32, 0x64); // note D (50) on with value 64
-            if (enable_bpm === true) midi.sendShortMsg(0x8f + midi_channel, 0x34, deck_bpm); // note E (52) on with value BPM
-        } else { // beat is of, send note off
-            if (enable_beat === true) {
-                midi.sendShortMsg(0x8F + midi_channel, 0x32, 0x0); // note D (50) on with value 0
-                midi.sendShortMsg(0x7F + midi_channel, 0x32, 0x0); // note D (59) off with value 0
+        if (!engine.getValue("[Channel" + (midi_for_light.deck_current + 1) + "]","loop_enabled")){ // temporary change: if looping is on, do not send out fast beats
+            if (value) { // beat is on, sending note on
+                if (enable_beat === true) midi.sendShortMsg(0x8F + midi_channel, 0x32, 0x64); // note D (50) on with value 64
+                if (enable_bpm === true) midi.sendShortMsg(0x8f + midi_channel, 0x34, deck_bpm); // note E (52) on with value BPM
+            } else { // beat is off, send note off
+                    if (enable_beat === true) {
+                    midi.sendShortMsg(0x8F + midi_channel, 0x32, 0x0); // note D (50) on with value 0
+                    midi.sendShortMsg(0x7F + midi_channel, 0x32, 0x0); // note D (59) off with value 0
+                }
             }
         }
     }
 };
+84
