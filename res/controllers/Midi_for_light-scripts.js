@@ -700,17 +700,17 @@ midi_for_light.deckBeatOutputToMidi = function(value, group, control) { // send 
     if (deck_bpm >= 127) deck_bpm = 127;
 
     if (midi_for_light.deck_current == deck) { // only when its the correct deck
-        if (!engine.getValue("[Channel" + (midi_for_light.deck_current + 1) + "]","loop_enabled")){ // temporary change: if looping is on, do not send out fast beats
-            if (value) { // beat is on, sending note on
-                if (enable_beat === true) midi.sendShortMsg(0x8F + midi_channel, 0x32, 0x64); // note D (50) on with value 64
-                if (enable_bpm === true) midi.sendShortMsg(0x8f + midi_channel, 0x34, deck_bpm); // note E (52) on with value BPM
-            } else { // beat is off, send note off
-                    if (enable_beat === true) {
-                    midi.sendShortMsg(0x8F + midi_channel, 0x32, 0x0); // note D (50) on with value 0
-                    midi.sendShortMsg(0x7F + midi_channel, 0x32, 0x0); // note D (59) off with value 0
-                }
+        if (value) { // beat is on, sending note on
+            // temporary change: if looping is on, do not send
+            if (enable_beat === true && !engine.getValue("[Channel" + (midi_for_light.deck_current + 1) + "]","loop_enabled")) {
+                midi.sendShortMsg(0x8F + midi_channel, 0x32, 0x64); // note D (50) on with value 64
+            }
+            if (enable_bpm === true) midi.sendShortMsg(0x8f + midi_channel, 0x34, deck_bpm); // note E (52) on with value BPM
+        } else { // beat is off, send note off
+            if (enable_beat === true) {
+                midi.sendShortMsg(0x8F + midi_channel, 0x32, 0x0); // note D (50) on with value 0
+                midi.sendShortMsg(0x7F + midi_channel, 0x32, 0x0); // note D (59) off with value 0
             }
         }
     }
 };
-84
