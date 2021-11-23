@@ -100,6 +100,9 @@ midi_for_light.init = function(id) { // called when the MIDI device is opened & 
     midi_for_light.scoreTimer = 0;          // timer for periodic scoring
     midi_for_light.scoreTimerPeriod = 1000; // wait time between calculating score
 
+    /////////////////////////////
+    //  PROPOSED FOR DELETION
+    ////////////////////////////
     //engine.connectControl("[Master]", "crossfader", "midi_for_light.crossfaderChange");
 
     if (enable_vu_meter_global === true) midi_for_light.vu_meter_timer = engine.beginTimer(40, "midi_for_light.vuMeter()");
@@ -220,7 +223,6 @@ midi_for_light.crossfaderChange = function(value, group, control) { // called wh
         // last control used, no points for inactive side
         deckScore[0][4] = 0;
         deckScore[2][4] = 0;
-        
     }
     
     if (crossfaderValue = 0) {
