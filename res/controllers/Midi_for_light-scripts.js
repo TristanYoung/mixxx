@@ -183,14 +183,19 @@ midi_for_light.deckFaderChange = function(value, group, control) { // called whe
 midi_for_light.crossfaderChange = function(value, group, control) { // called when deck fader is moved
     var pointValue = 0; // change this to increase awarded points from base crossfader position
     var crossfaderValue = engine.getValue("[Master]", "crossfader"); // crossfader position
+    var hamster_crossfader = engine.getValue("[Mixer Profile]", "xFaderReverse"); // hamster-style crossfader
 
     // crossfader deadzone calculation
     if (crossfaderValue >= -crossfader_deadzone && crossfaderValue <= crossfader_deadzone){
         crossfaderValue = 0;
     }
-   
-    
-    if (crossfaderValue < 0) { // crossfader tot he left of centre, points are between 0 and 1
+
+    // crossfader hamster-style correction
+    if (hamster_crossfader) {
+        crossfaderValue = -crossfaderValue;
+    }
+
+    if (crossfaderValue < 0) { // crossfader to the left of centre or hamster-style to the right of centre, points are between 0 and 1
         //award points for active fader, unary to make score positive
         deckScore[0][1] = -crossfaderValue * pointValue;
         deckScore[2][1] = -crossfaderValue * pointValue;
