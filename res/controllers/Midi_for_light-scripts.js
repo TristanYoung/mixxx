@@ -42,6 +42,7 @@ var enable_vu_right_average_fit = false; // set to false if you not need VU righ
 var enable_vu_right_current_meter = false; // set to false if you not need VU right current meter
 var enable_vu_right_average_meter = false; // set to false if you not need VU right average meter
 var crossfader_deadzone = .1; // increase number to increase the crossfader centre deadzone, valid numbers are 0 through 1
+var beatloop_size_minimum = 1 // minimum loop size to trigger loop beat output, .03125, .0625, .125, .25, .5, 1, 2, etc. Helps with fixtures that can't keep up.
 
 ///////////////////////////////////////////////////////////////
 //              GLOBAL FOR SCRIPT, DON'T TOUCH               //
@@ -726,9 +727,13 @@ midi_for_light.deckBeatOutputToMidi = function(value, group, control) { // send 
 
     if (midi_for_light.deck_current == deck) { // only when its the correct deck
         if (value) { // beat is on, sending note on
-            // temporary change: if looping is on, do not send
-            if (enable_beat === true && !engine.getValue("[Channel" + (midi_for_light.deck_current + 1) + "]","loop_enabled")) {
-                midi.sendShortMsg(0x8F + midi_channel, 0x32, 0x64); // note D (50) on with value 64
+            if (enable_beat === true) {
+                // send beat when not looping, or when beat loop is greater or equal to minimum beatloop size
+                if ((engine.getValue("[Channel" + (midi_for_light.deck_current + 1) + "]","loop_enabled") &&
+                engine.getValue("[Channel" + (midi_for_light.deck_current + 1) + "]", "beatloop_size") >= beatloop_size_minimum) ||
+                (!engine.getValue("[Channel" + (midi_for_light.deck_current + 1) + "]","loop_enabled"))) {
+                    midi.sendShortMsg(0x8F + midi_channel, 0x32, 0x64); // note D (50) on with value 64
+                }
             }
             if (enable_bpm === true) midi.sendShortMsg(0x8f + midi_channel, 0x34, deck_bpm); // note E (52) on with value BPM
         } else { // beat is off, send note off
