@@ -41,8 +41,18 @@ var enable_vu_right_average_max = false; // set to false if you not need VU righ
 var enable_vu_right_average_fit = false; // set to false if you not need VU right average fit 
 var enable_vu_right_current_meter = false; // set to false if you not need VU right current meter
 var enable_vu_right_average_meter = false; // set to false if you not need VU right average meter
-var crossfader_deadzone = .1; // increase number to increase the crossfader centre deadzone, valid numbers are 0 through 1
+var crossfader_deadzone = .15; // increase number to increase the crossfader centre deadzone, valid numbers are 0 through 1
 var beatloop_size_minimum = 1 // minimum loop size to trigger loop beat output, .03125, .0625, .125, .25, .5, 1, 2, etc. Helps with fixtures that can't keep up.
+
+///////////////////////////////////////////////////////////////
+//          SCORE POINTS TO DETERMINE ACTIVE DECK            //
+///////////////////////////////////////////////////////////////
+var score_deckfader = 2; // number of points awarded to deck fader control
+var score_crossfader = 1; // number of points awarded to crossfader control
+var score_playbutton = 3; // number of points awarded to play button control
+var score_syncbutton = 4; // number of points awarded to sync button control
+var score_lastusedcontrol = 1; // number of points awarded to last used fader control
+
 
 ///////////////////////////////////////////////////////////////
 //              GLOBAL FOR SCRIPT, DON'T TOUCH               //
@@ -76,9 +86,6 @@ var deckScore = [
     [0,0,0,0,0],
     [0,0,0,0,0]
     ];;
-
-// Which control was last used, for score tie-breaker
-var lastusedControl = 0;
 
 // Track when points have been updated
 var pointsUpdated = false;
@@ -167,21 +174,20 @@ midi_for_light.shutdown = function(id) { // called when the MIDI device is close
 // Deck fader position scoring
 midi_for_light.deckFaderChange = function(value, group, control) { // called when deck fader is moved
     var deck = parseInt(group.substring(8, 9)) - 1;
-    var pointValue = 0; // change this to increase awarded points from base fader position
 
-    deckScore[deck][0] = engine.getValue("[Channel" + (deck + 1) + "]", "volume") + pointValue; // fader position = point between 0 and 1 and add additional points
+    deckScore[deck][0] = engine.getValue("[Channel" + (deck + 1) + "]", "volume") + score_deckfader; // fader position = point between 0 and 1 and add additional points
 
+    // award points for last-used control
     for (i=0; i<4; i++){
         deckScore[i][4] = 0; // reset points on all controls
     }
-    deckScore[deck][4] = 1; // one point awarded for last control used
+    deckScore[deck][4] = score_lastusedcontrol;
     
     pointsUpdated = true;
 };
 
 // Crossfader position scoring
 midi_for_light.crossfaderChange = function(value, group, control) { // called when deck fader is moved
-    var pointValue = 0; // change this to increase awarded points from base crossfader position
     var crossfaderValue = engine.getValue("[Master]", "crossfader"); // crossfader position
     var hamster_crossfader = engine.getValue("[Mixer Profile]", "xFaderReverse"); // hamster-style crossfader
 
@@ -197,41 +203,41 @@ midi_for_light.crossfaderChange = function(value, group, control) { // called wh
 
     if (crossfaderValue < 0) { // crossfader to the left of centre or hamster-style to the right of centre, points are between 0 and 1
         //award points for active fader, unary to make score positive
-        deckScore[0][1] = -crossfaderValue * pointValue;
-        deckScore[2][1] = -crossfaderValue * pointValue;
+        deckScore[0][1] = score_crossfader; //-crossfaderValue * score_crossfader;
+        deckScore[2][1] = score_crossfader; //-crossfaderValue * score_crossfader;
         
         // no points to other decks
         deckScore[1][1] = 0;
         deckScore[3][1] = 0;
             
-        // last control used, award points for active side
-        deckScore[0][4] = 1;
-        deckScore[2][4] = 1;
+        // last control used, award points
+        deckScore[0][4] = score_lastusedcontrol;
+        deckScore[2][4] = score_lastusedcontrol;
 
-        // last control used, no points for inactive side
+        // last control used, clear points from inactive side
         deckScore[1][4] = 0;
         deckScore[3][4] = 0;
     }
-    
+
     if (crossfaderValue > 0) { // crossfader to the right of centre, points are between 0 and 1
         // award points for active fader position
-        deckScore[1][1] = crossfaderValue * pointValue;
-        deckScore[3][1] = crossfaderValue * pointValue;
+        deckScore[1][1] = score_crossfader; // crossfaderValue * score_crossfader;
+        deckScore[3][1] = score_crossfader; // crossfaderValue * score_crossfader;
         
         // no points to other decks
         deckScore[0][1] = 0;
         deckScore[2][1] = 0;
         
-        // last control used, award points for active side
-        deckScore[1][4] = 1;
-        deckScore[3][4] = 1;
+        // last control used, award points
+        deckScore[1][4] = score_lastusedcontrol;
+        deckScore[3][4] = score_lastusedcontrol;
 
-        // last control used, no points for inactive side
+        // last control used, clear points from inactive side
         deckScore[0][4] = 0;
         deckScore[2][4] = 0;
     }
     
-    if (crossfaderValue = 0) {
+    if (crossfaderValue == 0) {
         // fader position centred, no points
         deckScore[0][1] = 0;
         deckScore[1][1] = 0;
@@ -245,12 +251,11 @@ midi_for_light.crossfaderChange = function(value, group, control) { // called wh
 // Deck playing scoring
 midi_for_light.deckButtonPlay = function(value, group, control) {
     var deck = parseInt(group.substring(8, 9)) - 1;
-    var pointValue = 2; // change this to increase awarded points
 
     if (engine.getValue("[Channel" + (deck + 1) + "]", "play_latched")) {
-        deckScore[deck][2] = pointValue; // deck is playing 
+        deckScore[deck][2] = score_playbutton; // deck is playing 
     } else {
-        deckScore[deck][2] = 0;          // deck is not playing
+        deckScore[deck][2] = 0; // deck is not playing
     }
     
     pointsUpdated = true;
@@ -259,12 +264,11 @@ midi_for_light.deckButtonPlay = function(value, group, control) {
 // Dec master sync scoring
 midi_for_light.deckButtonSync = function(value, group, control) {
     var deck = parseInt(group.substring(8, 9)) - 1;
-    var pointValue = 2; // change this to increase awarded points
 
     if (engine.getValue("[Channel" + (deck + 1) + "]", "sync_master")) {
-        deckScore[deck][3] = pointValue; // master sync is enabled on deck
+        deckScore[deck][3] = score_syncbutton; // master sync is enabled on deck
     } else {
-        deckScore[deck][3] = 0;          // master sync is disabled on deck
+        deckScore[deck][3] = 0; // master sync is disabled on deck
     }
     
     pointsUpdated = true;
@@ -297,7 +301,6 @@ midi_for_light.calculatedeckScore  = function(value, group, control) {
     }
     
     pointsUpdated = false;
-    
 };
 
 
