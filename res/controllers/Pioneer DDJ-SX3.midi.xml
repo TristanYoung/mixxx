@@ -6674,7 +6674,8 @@
                     <normal/>
                 </options>
             </control>
-                            <group>[Channel1]</group>
+            <control>
+                <group>[Channel1]</group>
                 <key>beats_translate_later</key>
                 <description>MIDI Learned from 12 messages.</description>
                 <status>0x97</status>
