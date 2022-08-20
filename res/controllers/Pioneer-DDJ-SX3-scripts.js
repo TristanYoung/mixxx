@@ -81,9 +81,11 @@ PioneerDDJSX3.defaultFX1 = [1, 1, 1, 1];      // FX1 assignment
 PioneerDDJSX3.defaultFX2 = [1, 1, 1, 1];      // FX2 assignment
 
 // Set the crossfader values for slider positions 1, 2 and 3
-// For position 1, 2 and 3
 // Mixxx->Preferences->Crossfader->Slider value range: 0.6 to 999.6
-PioneerDDJSX3.crossfaderValue = [47, 2, 4];
+PioneerDDJSX3.crossfaderValue = [47, 1.77136, 4];
+
+// Set the crossfader calibration values for slider positions 1, 2 and 3
+PioneerDDJSX3.crossfaderCalibration = [.71845, .71845, .71845];
 
 // Reverse crossfader (Hamster style) for scratching w/ crossfader selector
 // For each of the 3 crossfader selector positions
@@ -91,7 +93,7 @@ PioneerDDJSX3.reverseCrossfader = [true, false, false];
 
 // Crossfader mode
 // For each of the crossfader selector positions: 0 = additive, 1 = constant power
-PioneerDDJSX3.crossfaderMode = [0, 1, 1];
+PioneerDDJSX3.crossfaderMode = [0, 0, 1];
 
 // Synchronize Mixxx's controls to the Serato-certified controller's controls upon startup
 PioneerDDJSX3.Serato_syncMixxxControls = true;
@@ -605,6 +607,7 @@ PioneerDDJSX3.init = function(id) {
     };
     PioneerDDJSX3.effectUnit[2].init();
 
+
     // PAD color setup - a hack to send the initial colors, until the PAD color code is ready to go
     for (var i=0; i<4; i++) {
         PioneerDDJSX3.initPadLeds(i);
@@ -671,50 +674,52 @@ PioneerDDJSX3.initPadLeds = function(deck) {
 };
 
 PioneerDDJSX3.resetPadLeds = function(deck) {
+    var i=0;
+
     // reset hotCue to white
-    for (var i=0; i<8; i++) {
+    for (i=0; i<8; i++) {
         PioneerDDJSX3.controlLED.bright(0x97+deck, PioneerDDJSX3.ledGroups.hotCue+i, PioneerDDJSX3.controlLED.lightWhite, true);
         PioneerDDJSX3.controlLED.bright(0x97+deck, PioneerDDJSX3.ledGroups.hotCueShifted+i, PioneerDDJSX3.controlLED.lightWhite, true); // shifted
     }
 
     // dim hotCue
-    for (var i=0; i<8; i++) {
+    for (i=0; i<8; i++) {
         PioneerDDJSX3.controlLED.dim(0x97+deck, PioneerDDJSX3.ledGroups.hotCue+i);
         PioneerDDJSX3.controlLED.dim(0x97+deck, PioneerDDJSX3.ledGroups.hotCueShifted+i); // shifted
     }
 
     // reset loopRoll to white
-    for (var i=0; i<8; i++) {
+    for (i=0; i<8; i++) {
         PioneerDDJSX3.controlLED.bright(0x97+deck, PioneerDDJSX3.ledGroups.loopRoll+i, PioneerDDJSX3.controlLED.lightWhite, true);
         PioneerDDJSX3.controlLED.bright(0x97+deck, PioneerDDJSX3.ledGroups.loopRollShifted+i, PioneerDDJSX3.controlLED.lightWhite, true); // shifted
     }
 
     // dim loopRoll
-    for (var i=0; i<8; i++) {
+    for (i=0; i<8; i++) {
         PioneerDDJSX3.controlLED.dim(0x97+deck, PioneerDDJSX3.ledGroups.loopRoll+i);
         PioneerDDJSX3.controlLED.dim(0x97+deck, PioneerDDJSX3.ledGroups.loopRollShifted+i); // shifted
     }
 
     // reset slicer to white
-    for (var i=0; i<8; i++) {
+    for (i=0; i<8; i++) {
         PioneerDDJSX3.controlLED.bright(0x97+deck, PioneerDDJSX3.ledGroups.slicer+i, PioneerDDJSX3.controlLED.lightWhite, true);
         PioneerDDJSX3.controlLED.bright(0x97+deck, PioneerDDJSX3.ledGroups.slicerShifted+i, PioneerDDJSX3.controlLED.lightWhite, true); // shifted
     }
 
     // dim slicer
-    for (var i=0; i<8; i++) {
+    for (i=0; i<8; i++) {
         PioneerDDJSX3.controlLED.dim(0x97+deck, PioneerDDJSX3.ledGroups.slicer+i);
         PioneerDDJSX3.controlLED.dim(0x97+deck, PioneerDDJSX3.ledGroups.slicerShifted+i); // shifted
     }
 
     // reset sampler to white
-    for (var i=0; i<8; i++) {
+    for (i=0; i<8; i++) {
         PioneerDDJSX3.controlLED.bright(0x97+deck, PioneerDDJSX3.ledGroups.sampler+i, PioneerDDJSX3.controlLED.lightWhite, true);
         PioneerDDJSX3.controlLED.bright(0x97+deck, PioneerDDJSX3.ledGroups.samplerShifted+i, PioneerDDJSX3.controlLED.lightWhite, true); // shifted
     }
 
     // dim sampler
-    for (var i=0; i<8; i++) {
+    for (i=0; i<8; i++) {
         PioneerDDJSX3.controlLED.dim(0x97+deck, PioneerDDJSX3.ledGroups.sampler+i);
         PioneerDDJSX3.controlLED.dim(0x97+deck, PioneerDDJSX3.ledGroups.samplerShifted+i); // shifted
     }
@@ -724,12 +729,8 @@ PioneerDDJSX3.resetPadLeds = function(deck) {
 PioneerDDJSX3.shutdown = function() {
     // clear pad Leds, must be called before resetDeck
     for (var i=0; i<4; i++) {
+        PioneerDDJSX3.keepSeratoalive();
         PioneerDDJSX3.resetPadLeds(i);
-    }
-    
-    // stop timers
-    if (PioneerDDJSX3.keepaliveTimer) {
-        engine.stopTimer(PioneerDDJSX3.keepaliveTimer);
     }
     
     PioneerDDJSX3.resetDeck("[Channel1]");
@@ -738,6 +739,11 @@ PioneerDDJSX3.shutdown = function() {
     PioneerDDJSX3.resetDeck("[Channel4]");
 
     PioneerDDJSX3.resetNonDeckLeds();
+    
+    // stop timers
+    if (PioneerDDJSX3.keepaliveTimer) {
+        engine.stopTimer(PioneerDDJSX3.keepaliveTimer);
+    }
 };
 
 
@@ -1029,6 +1035,8 @@ PioneerDDJSX3.initDeck = function(group) {
     PioneerDDJSX3.wheelLedControl(group, PioneerDDJSX3.wheelLedCircle.minVal);
 	PioneerDDJSX3.wheelCentreLedControl(group, PioneerDDJSX3.wheelCentreLed.minVal);
     PioneerDDJSX3.nonPadLedControl(group, PioneerDDJSX3.nonPadLeds.hotCueMode, true); // set HOT CUE Pad-Mode
+    
+    //PioneerDDJSX3.controlLED.bright(0x97, 0x00, 0x1C, true); //PioneerDDJSX3.loopRollColors[1], true);
 };
 
 PioneerDDJSX3.resetDeck = function(group) {
@@ -1240,8 +1248,10 @@ PioneerDDJSX3.crossfaderSelector = function(channel, control, value, status, gro
         }
         // Crossfader mode: additive or constant power
         engine.setValue("[Mixer Profile]", "xFaderMode", PioneerDDJSX3.crossfaderMode[position]);
-        // Curve
+        // Crossfader curve
         engine.setValue("[Mixer Profile]", "xFaderCurve", PioneerDDJSX3.crossfaderValue[position]);
+        // Crossfader calibration
+        engine.setValue("[Mixer Profile]", "xFaderCalibration", PioneerDDJSX3.crossfaderCalibration[position]);
         // Normal or reverse fader
         engine.setValue("[Mixer Profile]", "xFaderReverse", PioneerDDJSX3.reverseCrossfader[position]);
     }
@@ -2103,19 +2113,19 @@ PioneerDDJSX3.padLedControl = function(deck, groupNumber, ledNumber, shift, acti
         dim = 0x00;
 
     if (midiChannelOffset !== null) {
-        if (PioneerDDJSX3.activePadMode[midiChannelOffset] === PioneerDDJSX3.padModes.hotCue){
+        if (PioneerDDJSX3.activePadMode[midiChannelOffset] === PioneerDDJSX3.padModes.hotCue) {
             // set hotcue colors or dim
             color = PioneerDDJSX3.hotCueColors[ledNumber];
-        } else if (PioneerDDJSX3.activePadMode[midiChannelOffset] === PioneerDDJSX3.padModes.loopRoll){
+        } else if (PioneerDDJSX3.activePadMode[midiChannelOffset] === PioneerDDJSX3.padModes.loopRoll) {
             // set roll colors or dim
             color = PioneerDDJSX3.loopRollColors[ledNumber];
             if (active) {
                 dim = color;
             }
-        } else if (PioneerDDJSX3.activePadMode[midiChannelOffset] === PioneerDDJSX3.padModes.slicer){
+        } else if (PioneerDDJSX3.activePadMode[midiChannelOffset] === PioneerDDJSX3.padModes.slicer) {
              // set slicer colors or dim
              color = PioneerDDJSX3.slicerColors[ledNumber];
-        } else if (PioneerDDJSX3.activePadMode[midiChannelOffset] === PioneerDDJSX3.padModes.sampler){
+        } else if (PioneerDDJSX3.activePadMode[midiChannelOffset] === PioneerDDJSX3.padModes.sampler) {
             // set sampler colors or dim
             color = PioneerDDJSX3.samplerColors[ledNumber];
         }
@@ -2620,6 +2630,9 @@ PioneerDDJSX3.pitchBendFromJog = function(group, movement) {
 //             ROTARY SELECTOR & NAVIGATION BUTTONS          //
 ///////////////////////////////////////////////////////////////
 
+// Added by Tristan
+PioneerDDJSX3.libraryPane = 0;  // initial pane to focus on startup. 0 = library select pane, 1 = track select pane
+
 PioneerDDJSX3.loadPrepareButton = function(channel, control, value, status) {
     if (PioneerDDJSX3.rotarySelectorChanged === true) {
         if (value) {
@@ -2641,10 +2654,21 @@ PioneerDDJSX3.loadPrepareButton = function(channel, control, value, status) {
     }
 };
 
+//PioneerDDJSX3.backButton = function(channel, control, value, status) {
+//    script.toggleControl("[Library]", "MoveFocusBackward");
+//};
+
+// Added by Tristan
 PioneerDDJSX3.backButton = function(channel, control, value, status) {
-    script.toggleControl("[Library]", "MoveFocusBackward");
+    if (PioneerDDJSX3.libraryPane) {
+        //script.toggleControl("[Library]", "MoveFocusBackward");  // Not required, ok to delete.
+        
+        // change focus to playlist pane
+        PioneerDDJSX3.libraryPane = 0;
+    }
 };
 
+// This function is ok
 PioneerDDJSX3.shiftBackButton = function(channel, control, value, status) {
     if (value) {
         script.toggleControl("[Master]", "maximize_library");
@@ -2661,10 +2685,12 @@ PioneerDDJSX3.getRotaryDelta = function(value) {
     return delta;
 };
 
+// In progress
 PioneerDDJSX3.rotarySelector = function(channel, control, value, status) {
     var delta = PioneerDDJSX3.getRotaryDelta(value);
 
-    engine.setValue("[Library]", "MoveVertical", delta);
+    //engine.setValue("[Library]", "MoveVertical", delta);
+    engine.setValue("[Playlist]", PioneerDDJSX3.libraryPane?"SelectTrackKnob":"SelectPlaylist", delta);
     PioneerDDJSX3.rotarySelectorChanged = true;
 };
 
@@ -2675,9 +2701,57 @@ PioneerDDJSX3.rotarySelectorShifted = function(channel, control, value, status) 
     engine.setValue("[Library]", "MoveHorizontal", delta);
 };
 
-PioneerDDJSX3.rotarySelectorClick = function(channel, control, value, status) {
-    script.toggleControl("[Library]", "GoToItem");
-};
+// Rotary Selector button behaviour
+    // Long press (>500 ms): jump to the track pane
+    // Quick press: expand/collapse library branch
+
+    // Last time the Rotary Selector button was pressed before released
+    PioneerDDJSX3.selectorLongpress = false;
+    PioneerDDJSX3.selectorTimer = 0;
+
+    PioneerDDJSX3.selectorAssertLongpress = function() {
+        PioneerDDJSX3.selectorLongpress = true;
+        PioneerDDJSX3.selectorTimer = 0;
+    };
+
+    PioneerDDJSX3.selectorDown = function() {
+        PioneerDDJSX3.selectorLongpress = false;
+        PioneerDDJSX3.selectorTimer = engine.beginTimer(500, "PioneerDDJSX3.selectorAssertLongpress()", true);
+    };
+
+    PioneerDDJSX3.selectorUp = function(group) {
+        if (PioneerDDJSX3.selectorTimer !== 0) {
+            engine.stopTimer(PioneerDDJSX3.selectorTimer);
+            PioneerDDJSX3.selectorTimer = 0;
+        }
+        if (PioneerDDJSX3.selectorLongpress) {
+            // change focus to track list
+            PioneerDDJSX3.libraryPane = 1;
+        } else {
+            if (PioneerDDJSX3.libraryPane) {
+                script.toggleControl("[Playlist]", "LoadSelectedIntoFirstStopped");
+            } else {
+                script.toggleControl("[Playlist]", "ToggleSelectedSidebarItem");
+            }
+        }
+    };
+    
+    PioneerDDJSX3.rotarySelectorClick = function(channel, control, value, status, group) {
+    //Rotary Selector hold <500ms: library pane expand/collapse branch, >500ms: track select
+    if (value) {
+        PioneerDDJSX3.selectorDown();
+        } else {
+        PioneerDDJSX3.selectorUp(group);
+        }
+    };
+
+
+
+// In progress
+//PioneerDDJSX3.rotarySelectorClick = function(channel, control, value, status) {
+    //script.toggleControl("[Library]", "GoToItem");
+//    script.toggleControl("[Playlist]", "ToggleSelectedSidebarItem");
+//};
 
 PioneerDDJSX3.rotarySelectorShiftedClick = function(channel, control, value, status) {
     if (PioneerDDJSX3.autoDJAddTop) {
