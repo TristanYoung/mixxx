@@ -1136,12 +1136,24 @@ PioneerDDJSX3.tempoSliderLSB = function(channel, control, value, status, group) 
 };
 
 PioneerDDJSX3.gainKnobMSB = function(channel, control, value, status, group) {
-    PioneerDDJSX3.highResMSB[group].gainKnob = value;
+// In DJ Serato Pro, trim knobs use linear law for first half (0x00..0x3F), and linear law for second half (0x00..0x6B)
+
+    if (value < 0x40)
+        PioneerDDJSX3.highResMSB[group].gainKnob = value;
+    else
+        PioneerDDJSX3.highResMSB[group].gainKnob = 0x40 + (value - 0x40) * 63 / 43;
+
 };
 
 PioneerDDJSX3.gainKnobLSB = function(channel, control, value, status, group) {
-    var fullValue = (PioneerDDJSX3.highResMSB[group].gainKnob << 7) + value;
-    engine.setParameter(group, "pregain", fullValue / 0x3FFF);
+    
+    var fullValue;
+    if (value < 0x40)
+        fullValue = (PioneerDDJSX3.highResMSB[group].gainKnob << 7) + value;
+    else
+        fullValue = (PioneerDDJSX3.highResMSB[group].gainKnob << 7) + 0x40 + (value - 0x40) * 63 / 43;
+     engine.setParameter(group, "pregain", fullValue / 0x3FFF);
+
 };
 
 PioneerDDJSX3.filterHighKnobMSB = function(channel, control, value, status, group) {
