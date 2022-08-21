@@ -165,6 +165,10 @@ PioneerDDJSX3.wheelCentreLed = [0, 0, 0, 0];
 PioneerDDJSX3.wheelCentreLedStyle = 1; // 0 = rotation, 1 = beats (static beat grid)
 PioneerDDJSX3.setUpSpeedSliderRange = [0.08, 0.08, 0.08, 0.08];
 
+// LOAD button behaviour
+PioneerDDJSX3.loadButtonLongPress = false;
+PioneerDDJSX3.loadTimer = 0;
+
 // Sync button behaviour
 PioneerDDJSX3.syncLongPress = false;
 PioneerDDJSX3.syncTimer = 0;
@@ -728,21 +732,21 @@ PioneerDDJSX3.resetPadLeds = function(deck) {
 
 PioneerDDJSX3.shutdown = function() {
     // clear pad Leds, must be called before resetDeck
-    for (var i=0; i<4; i++) {
-        PioneerDDJSX3.keepSeratoalive();
-        PioneerDDJSX3.resetPadLeds(i);
-    }
-    
-    PioneerDDJSX3.resetDeck("[Channel1]");
-    PioneerDDJSX3.resetDeck("[Channel2]");
-    PioneerDDJSX3.resetDeck("[Channel3]");
-    PioneerDDJSX3.resetDeck("[Channel4]");
+//    for (var i=0; i<4; i++) {
+//        PioneerDDJSX3.keepSeratoalive();
+//        PioneerDDJSX3.resetPadLeds(i);
+//    }
+   
+//    PioneerDDJSX3.resetDeck("[Channel1]");
+//    PioneerDDJSX3.resetDeck("[Channel2]");
+//    PioneerDDJSX3.resetDeck("[Channel3]");
+//    PioneerDDJSX3.resetDeck("[Channel4]");
 
-    PioneerDDJSX3.resetNonDeckLeds();
+//    PioneerDDJSX3.resetNonDeckLeds();
     
-    // stop timers
-    if (PioneerDDJSX3.keepaliveTimer) {
-        engine.stopTimer(PioneerDDJSX3.keepaliveTimer);
+// stop timers
+  if (PioneerDDJSX3.keepaliveTimer) {
+      engine.stopTimer(PioneerDDJSX3.keepaliveTimer);
     }
 };
 
@@ -1807,8 +1811,24 @@ PioneerDDJSX3.loopMoveForwardButton = function(channel, control, value, status, 
     script.toggleControl(group, "beatjump_1_forward");
 };
 
-PioneerDDJSX3.loadButton = function(channel, control, value, status, group) {
-    if (value) {
+PioneerDDJSX3.loadButtonAssertLongPress = function() {
+    PioneerDDJSX3.loadButtonLongPress = true;
+    PioneerDDJSX3.loadTimer = 0;
+};
+
+PioneerDDJSX3.loadButtonDown = function() {
+    PioneerDDJSX3.loadButtonLongPress = false;
+    PioneerDDJSX3.loadTimer = engine.beginTimer(500, "PioneerDDJSX3.loadButtonAssertLongPress()", true);
+};
+
+PioneerDDJSX3.loadButtonUp = function(group) {
+    if (PioneerDDJSX3.loadTimer !== 0) {
+        engine.stopTimer(PioneerDDJSX3.loadTimer);
+        PioneerDDJSX3.loadTimer = 0;
+    }
+    if (PioneerDDJSX3.loadButtonLongPress) {
+        engine.setValue(group, 'eject', true);
+    } else {
         engine.setValue(group, "LoadSelectedTrack", true);
         if (PioneerDDJSX3.autoPFL) {
             for (var index in PioneerDDJSX3.channelGroups) {
@@ -1821,6 +1841,16 @@ PioneerDDJSX3.loadButton = function(channel, control, value, status, group) {
                 }
             }
         }
+    }
+};
+    
+PioneerDDJSX3.loadButton = function(channel, control, value, status, group) {
+// Tap LOAD: load track
+// Long-press LOAD: eject
+if (value == 0x7F) {
+    PioneerDDJSX3.loadButtonDown();
+    } else {
+    PioneerDDJSX3.loadButtonUp(group);
     }
 };
 
