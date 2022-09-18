@@ -729,6 +729,20 @@ PioneerDDJSX3.resetPadLeds = function(deck) {
     }
 };
 
+PioneerDDJSX3.waveformZoomOut = function(channel, control, value, status, group) {
+// Zoom the waveform out one level
+    script.toggleControl(group, "waveform_zoom_up")
+}
+
+PioneerDDJSX3.waveformZoomIn = function(channel, control, value, status, group) {
+// Zoom the waveform in one level
+    script.toggleControl(group, "waveform_zoom_down")
+}
+
+PioneerDDJSX3.waveformZoomSetDefault = function(channel, control, value, status, group) {
+// Zoom the waveform to default
+    script.triggerControl(group, "waveform_zoom_set_default");
+}
 
 PioneerDDJSX3.shutdown = function() {
     // clear pad Leds, must be called before resetDeck

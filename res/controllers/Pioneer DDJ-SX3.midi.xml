@@ -6754,6 +6754,125 @@
                     <normal/>
                 </options>
             </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>PioneerDDJSX3.waveformZoomIn</key>
+                <description>Zoom waveform down Deck 1, Button: PAD5 (in CUE LOOP-mode)</description>
+                <status>0x97</status>
+                <midino>0x44</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>PioneerDDJSX3.waveformZoomOut</key>
+                <description>Zoom waveform up Deck 1, Button: PAD7 (in CUE LOOP-mode)</description>
+                <status>0x97</status>
+                <midino>0x45</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>PioneerDDJSX3.waveformZoomSetDefault</key>
+                <description>Zoom waveform to default Deck 1, Button: PAD6 (in CUE LOOP-mode)</description>
+                <status>0x97</status>
+                <midino>0x46</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>PioneerDDJSX3.waveformZoomIn</key>
+                <description>Zoom waveform down Deck 2, Button: PAD5 (in CUE LOOP-mode)</description>
+                <status>0x98</status>
+                <midino>0x44</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>PioneerDDJSX3.waveformZoomOut</key>
+                <description>Zoom waveform up Deck 2, Button: PAD7 (in CUE LOOP-mode)</description>
+                <status>0x98</status>
+                <midino>0x45</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>PioneerDDJSX3.waveformZoomSetDefault</key>
+                <description>Zoom waveform to default Deck 2, Button: PAD6 (in CUE LOOP-mode)</description>
+                <status>0x98</status>
+                <midino>0x46</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>            <control>
+                <group>[Channel3]</group>
+                <key>PioneerDDJSX3.waveformZoomIn</key>
+                <description>Zoom waveform down Deck 3, Button: PAD5 (in CUE LOOP-mode)</description>
+                <status>0x99</status>
+                <midino>0x44</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>PioneerDDJSX3.waveformZoomOut</key>
+                <description>Zoom waveform up Deck 3, Button: PAD7 (in CUE LOOP-mode)</description>
+                <status>0x99</status>
+                <midino>0x45</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>PioneerDDJSX3.waveformZoomSetDefault</key>
+                <description>Zoom waveform to default Deck 3, Button: PAD6 (in CUE LOOP-mode)</description>
+                <status>0x99</status>
+                <midino>0x46</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>PioneerDDJSX3.waveformZoomIn</key>
+                <description>Zoom waveform down Deck 4, Button: PAD5 (in CUE LOOP-mode)</description>
+                <status>0x9A</status>
+                <midino>0x44</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>PioneerDDJSX3.waveformZoomOut</key>
+                <description>Zoom waveform up Deck 4, Button: PAD7 (in CUE LOOP-mode)</description>
+                <status>0x9A</status>
+                <midino>0x45</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>PioneerDDJSX3.waveformZoomSetDefault</key>
+                <description>Zoom waveform to default Deck 4, Button: PAD6 (in CUE LOOP-mode)</description>
+                <status>0x9A</status>
+                <midino>0x46</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
         </controls>
         <outputs/>
     </controller>
