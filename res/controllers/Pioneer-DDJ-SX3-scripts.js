@@ -95,6 +95,9 @@ PioneerDDJSX3.reverseCrossfader = [true, false, false];
 // For each of the crossfader selector positions: 0 = additive, 1 = constant power
 PioneerDDJSX3.crossfaderMode = [0, 0, 1];
 
+// Resume playback after brake. false = stop after brake, true = resume after brake
+PioneerDDJSX3.resumeAfterBrake = false;
+
 // Synchronize Mixxx's controls to the Serato-certified controller's controls upon startup
 PioneerDDJSX3.Serato_syncMixxxControls = true;
 
@@ -1315,7 +1318,9 @@ PioneerDDJSX3.playButton = function(channel, control, value, status, group) {
     if (value) {
         if (playing) {
             script.brake(channel, control, value, status, group);
-            PioneerDDJSX3.toggledBrake[deck] = true;
+            if (PioneerDDJSX3.resumeAfterBrake) {
+                PioneerDDJSX3.toggledBrake[deck] = true;
+            }
         } else {
             script.toggleControl(group, "play");
         }
