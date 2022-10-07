@@ -11,7 +11,7 @@ var PioneerDDJSX3 = function() {};
 
 /*
     Author:         Tristan Young
-    Version:        1.1, 08/05/2021
+    Version:        1.2, 10/07/2022
     Description:    Pioneer DDJ-SX3 Controller Mapping for Mixxx
     Source:         https://github.com/TristanYoung/mixxx/tree/Pioneer-DDJ-SX3-Controller-Mapping
 
@@ -70,9 +70,10 @@ PioneerDDJSX3.Resonance = 4;
 
 // Default gain and mix settings
 // Range 0 to 1, 0.5 is the default for each setting
-PioneerDDJSX3.masterGain = .25,   // default startup master gain
+PioneerDDJSX3.masterGain = .5,   // default startup master gain
+PioneerDDJSX3.boothGain = .25,   // default startup master gain
 PioneerDDJSX3.headphoneGain = .5, // default startup headphone gain
-PioneerDDJSX3.headphoneMix = .5,  // default startup headphone mix
+PioneerDDJSX3.headphoneMix = .17,  // default startup headphone mix
 
 // Set default button/assignment state on startup. 0 = off, 1 = on, 2 = last used
 PioneerDDJSX3.defaultKeyLock = [1, 1, 1, 1];  // keylock state
@@ -187,6 +188,7 @@ PioneerDDJSX3.padModes = {
     'group3': 6,
     'group4': 7
 };
+
 PioneerDDJSX3.activePadMode = [
     PioneerDDJSX3.padModes.hotCue,
     PioneerDDJSX3.padModes.hotCue,
@@ -540,9 +542,10 @@ PioneerDDJSX3.init = function(id) {
         engine.setValue("[QuickEffectRack1_[Channel"+(i+1)+"]_Effect1]","parameter2",PioneerDDJSX3.Resonance);
     }
 
-    // set Mixxx master gain, headphone gain, headphone mix
+    // set Mixxx master gain, booth gain, headphone gain, headphone mix
     // as of Mixxx v2.3, Mixx does not save defaults for these controls
     engine.setParameter("[Master]","gain",PioneerDDJSX3.masterGain);
+    engine.setParameter("[Master]","booth_gain",PioneerDDJSX3.boothGain);
     engine.setParameter("[Master]","headGain",PioneerDDJSX3.headphoneGain);
     engine.setParameter("[Master]","headMix",PioneerDDJSX3.headphoneMix);
 
